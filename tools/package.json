@@ -1,0 +1,12 @@
+{
+  "name": "devadecor-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Utility scripts for Deva Decor affiliate site",
+  "scripts": {
+    "refresh-prices": "node refresh-prices.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

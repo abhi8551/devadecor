@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#b8976a">
+  <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.svg">
+  <link rel="canonical" href="https://devadecor.com/">
+  <meta name="description" content="Deva Decor — Elevate your space with timeless, handcrafted home decor. Shop wall art, lighting, furniture, vases, rugs & mirrors.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Deva Decor — Timeless Home Decor">
+  <meta property="og:description" content="Deva Decor — Elevate your space with timeless, handcrafted home decor. Shop wall art, lighting, furniture, vases, rugs & mirrors.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=630&fit=crop">
+  <meta property="og:url" content="https://devadecor.com/index.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Deva Decor — Timeless Home Decor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff2" as="font" type="font/woff2" crossorigin>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://formspree.io https://www.google-analytics.com; frame-src 'none';">
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop" fetchpriority="high">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <!-- Loader -->
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-logo">DEVA</div>
+      <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-text">DEVA</span>
+        <span class="logo-sub">DECOR</span>
+      </a>
+
+      <ul class="nav-menu" id="navMenu">
+        <li class="nav-item has-dropdown">
+          <a href="shop.html" class="nav-link">Shop</a>
+          <div class="dropdown-menu mega-dropdown">
+            <div class="dropdown-grid">
+              <div class="dropdown-col">
+                <h4>Categories</h4>
+                <a href="shop.html?cat=wall-art">Wall Art</a>
+                <a href="shop.html?cat=lighting">Lighting</a>
+                <a href="shop.html?cat=furniture">Furniture</a>
+                <a href="shop.html?cat=vases">Vases</a>
+                <a href="shop.html?cat=rugs">Rugs</a>
+                <a href="shop.html?cat=mirrors">Mirrors</a>
+                <a href="shop.html?cat=textiles">Textiles</a>
+              </div>
+              <div class="dropdown-col">
+                <h4>Inspiration</h4>
+                <a href="shop.html">New Arrivals</a>
+                <a href="shop.html">Best Sellers</a>
+                <a href="room-living.html">Living Room</a>
+                <a href="room-bedroom.html">Bedroom</a>
+                <a href="room-dining.html">Dining Room</a>
+              </div>
+              <div class="dropdown-col dropdown-featured">
+                <div class="dropdown-card">
+                  <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop" alt="New Collection" loading="lazy">
+                  <h4>The Spring Collection</h4>
+                  <p>Discover fresh designs</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item"><a href="room-living.html" class="nav-link">Inspiration</a></li>
+        <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+        <li class="nav-item"><a href="journal.html" class="nav-link">Journal</a></li>
+        <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="nav-action-btn search-toggle" id="searchToggle" aria-label="Search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="nav-action-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search for products, collections..." autocomplete="off">
+        <button class="search-close" id="searchClose" aria-label="Close search">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="search-suggestions" id="searchSuggestions"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-bg">
+        <div class="hero-slide active">
+          <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop" alt="Elegant living room decor" loading="eager" fetchpriority="high" width="1920" height="1080">
+        </div>
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&h=1080&fit=crop" alt="Modern interior design" loading="lazy" width="1920" height="1080">
+        </div>
+        <div class="hero-slide">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&h=1080&fit=crop" alt="Luxury home styling" loading="lazy" width="1920" height="1080">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-grain"></div>
+      </div>
+      <div class="hero-content" data-animate="fade-up">
+        <span class="hero-tag">New Collection 2026</span>
+        <h1 class="hero-title">Elevate Your Space<br>with Timeless Decor</h1>
+        <p class="hero-subtitle">Handcrafted pieces that transform houses into homes. Curated with intention, designed to inspire.</p>
+        <div class="hero-actions">
+          <a href="#featured" class="btn btn-primary btn-lg">Shop Now</a>
+          <a href="room-living.html" class="btn btn-outline-light btn-lg">Explore Rooms</a>
+        </div>
+      </div>
+      <div class="hero-scroll">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="marquee-bar">
+      <div class="marquee-track">
+        <span>Curated Home Decor Picks</span>
+        <span class="marquee-dot">◆</span>
+        <span>Handcrafted with Love</span>
+        <span class="marquee-dot">◆</span>
+        <span>Free Shipping on All Orders</span>
+        <span class="marquee-dot">◆</span>
+        <span>Sustainable Materials</span>
+        <span class="marquee-dot">◆</span>
+        <span>Curated Home Decor Picks</span>
+        <span class="marquee-dot">◆</span>
+        <span>Handcrafted with Love</span>
+        <span class="marquee-dot">◆</span>
+        <span>Free Shipping on All Orders</span>
+        <span class="marquee-dot">◆</span>
+        <span>Sustainable Materials</span>
+        <span class="marquee-dot">◆</span>
+      </div>
+    </div>
+
+    <!-- Today's Decor Deals -->
+    <section class="deals-section" id="deals">
+      <div class="container">
+        <div class="section-header" data-animate="blur-in">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Limited Time</span>
+          <h2 class="section-title">Today's Decor Deals</h2>
+          <p class="section-desc">Our handpicked selection of discounted pieces — available while supplies last.</p>
+        </div>
+        <div class="deals-grid" id="dealsGrid" data-animate="stagger"></div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--bg"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,60 C360,0 1080,0 1440,60 L1440,60 L0,60 Z" fill="var(--color-bg)"/></svg></div>
+
+    <!-- Featured Products Carousel -->
+    <section class="section" id="featured" style="position:relative;overflow:hidden">
+      <div class="floating-orb floating-orb-1"></div>
+      <div class="container">
+        <div class="section-header" data-animate="scale-in">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Curated Selection</span>
+          <h2 class="section-title">Featured Products</h2>
+          <p class="section-desc">Discover our most loved pieces, carefully selected for the discerning eye.</p>
+        </div>
+        <div class="carousel-wrapper">
+          <div class="carousel" id="featuredCarousel">
+            <div class="carousel-track" id="featuredTrack">
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" data-carousel="featured" aria-label="Previous">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="carousel-btn carousel-next" data-carousel="featured" aria-label="Next">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--alt"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg-alt)"/></svg></div>
+
+    <!-- Categories Section -->
+    <section class="section section-alt" id="categories">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Browse</span>
+          <h2 class="section-title">Shop by Category</h2>
+        </div>
+
+        <div class="categories-grid" data-animate="stagger">
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600&h=700&fit=crop" alt="Wall Art" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Wall Art</h3>
+              <span class="category-count">48 pieces</span>
+            </div>
+          </a>
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600&h=700&fit=crop" alt="Lighting" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Lighting</h3>
+              <span class="category-count">36 pieces</span>
+            </div>
+          </a>
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=700&fit=crop" alt="Furniture" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Furniture</h3>
+              <span class="category-count">64 pieces</span>
+            </div>
+          </a>
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=600&h=700&fit=crop" alt="Vases" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Vases</h3>
+              <span class="category-count">29 pieces</span>
+            </div>
+          </a>
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1600166898405-da9535204843?w=600&h=700&fit=crop" alt="Rugs" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Rugs</h3>
+              <span class="category-count">42 pieces</span>
+            </div>
+          </a>
+          <a href="shop.html" class="category-card" data-animate="clip-reveal">
+            <div class="category-img">
+              <img src="https://images.unsplash.com/photo-1618220179428-22790b461013?w=600&h=700&fit=crop" alt="Mirrors" loading="lazy" width="600" height="700">
+            </div>
+            <div class="category-info">
+              <h3>Mirrors</h3>
+              <span class="category-count">22 pieces</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--bg section-divider--flip"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg)"/></svg></div>
+
+    <!-- Trending Collections Carousel -->
+    <section class="section" id="collections" style="position:relative;overflow:hidden">
+      <div class="floating-orb floating-orb-2"></div>
+      <div class="container">
+        <div class="section-header" data-animate="blur-in">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Trending Now</span>
+          <h2 class="section-title">Our Collections</h2>
+          <p class="section-desc">Thoughtfully curated collections to match every aesthetic and mood.</p>
+        </div>
+        <div class="collections-grid" data-animate="fade-up">
+          <a href="shop.html" class="collection-card collection-card-lg">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop" alt="Modern Minimalism" loading="lazy">
+            <div class="collection-overlay">
+              <span class="collection-tag">12 Products</span>
+              <h3>Modern Minimalism</h3>
+              <span class="collection-link">View Collection →</span>
+            </div>
+          </a>
+          <a href="shop.html" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=400&fit=crop" alt="Warm & Cozy" loading="lazy">
+            <div class="collection-overlay">
+              <span class="collection-tag">18 Products</span>
+              <h3>Warm & Cozy</h3>
+              <span class="collection-link">View Collection →</span>
+            </div>
+          </a>
+          <a href="shop.html" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop" alt="Scandi Living" loading="lazy">
+            <div class="collection-overlay">
+              <span class="collection-tag">15 Products</span>
+              <h3>Scandi Living</h3>
+              <span class="collection-link">View Collection →</span>
+            </div>
+          </a>
+          <a href="shop.html" class="collection-card collection-card-lg">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop" alt="Luxury Living" loading="lazy">
+            <div class="collection-overlay">
+              <span class="collection-tag">22 Products</span>
+              <h3>Luxury Living</h3>
+              <span class="collection-link">View Collection →</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about-section" id="about">
+      <div class="container">
+        <div class="about-grid" data-animate="fade-left">
+          <div class="about-images">
+            <div class="about-img-main">
+              <img src="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=600&h=750&fit=crop" alt="Artisan crafting decor" loading="lazy">
+            </div>
+            <div class="about-img-accent">
+              <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop" alt="Decor detail" loading="lazy">
+            </div>
+          </div>
+          <div class="about-content">
+            <span class="section-tag">Our Story</span>
+            <h2 class="section-title">Crafted with Passion,<br>Designed for Living</h2>
+            <p>At Deva Decor, we believe every space tells a story. Founded in 2018, we've been on a mission to bring artisan-crafted, sustainable home decor to discerning homeowners who value quality, beauty, and intention.</p>
+            <p>Each piece in our collection is thoughtfully sourced from skilled artisans around the world, blending traditional craftsmanship with contemporary design to create timeless pieces that elevate everyday living.</p>
+            <div class="about-stats" data-animate="counter">
+              <div class="stat">
+                <span class="stat-num">5000+</span>
+                <span class="stat-label">Happy Homes</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">200+</span>
+                <span class="stat-label">Unique Pieces</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num">50+</span>
+                <span class="stat-label">Artisan Partners</span>
+              </div>
+            </div>
+            <a href="contact.html" class="btn btn-primary">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--alt"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg-alt)"/></svg></div>
+
+    <!-- Customer Favorites Carousel -->
+    <section class="section section-alt" id="favorites">
+      <div class="container">
+        <div class="section-header" data-animate="scale-in">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Most Loved</span>
+          <h2 class="section-title">Customer Favorites</h2>
+          <p class="section-desc">The pieces our customers can't stop raving about.</p>
+        </div>
+        <div class="carousel-wrapper">
+          <div class="carousel" id="favoritesCarousel">
+            <div class="carousel-track" id="favoritesTrack">
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+              <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" data-carousel="favorites" aria-label="Previous">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button class="carousel-btn carousel-next" data-carousel="favorites" aria-label="Next">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--bg section-divider--flip"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg)"/></svg></div>
+
+    <!-- Parallax Banner -->
+    <section class="parallax-banner">
+      <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&h=800&fit=crop')"></div>
+      <div class="parallax-content" data-animate="blur-in">
+        <h2>Transform Every Room<br>Into a Sanctuary</h2>
+        <a href="#featured" class="btn btn-primary btn-lg">Discover More</a>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section" id="testimonials">
+      <div class="container">
+        <div class="section-header" data-animate="blur-in">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">Reviews</span>
+          <h2 class="section-title">What Our Customers Say</h2>
+        </div>
+        <div class="testimonials-carousel" data-animate="fade-up">
+          <div class="testimonial-track" id="testimonialTrack">
+            <div class="testimonial-card">
+              <div class="testimonial-card-inner">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Absolutely stunning quality. The ceramic vase I ordered exceeded my expectations — it's become the centerpiece of my living room."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-avatar">SC</div>
+                  <div>
+                    <strong>Sarah Chen</strong>
+                    <span>Verified Buyer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-card-inner">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Deva Decor transformed my apartment. The attention to detail in every piece shows real craftsmanship. Will definitely be ordering again."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-avatar">MR</div>
+                  <div>
+                    <strong>Marcus Rivera</strong>
+                    <span>Verified Buyer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-card-inner">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"The mirror I purchased is perfect — elegant and beautifully made. Shipping was fast and the packaging was impeccable. Highly recommend!"</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-avatar">EJ</div>
+                  <div>
+                    <strong>Emma Johnson</strong>
+                    <span>Verified Buyer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-card-inner">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"I've bought from many home decor stores but Deva stands apart. The quality is unmatched and every piece feels special and unique."</p>
+                <div class="testimonial-author">
+                  <div class="testimonial-avatar">AP</div>
+                  <div>
+                    <strong>Aisha Patel</strong>
+                    <span>Verified Buyer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-dots" id="testimonialDots"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider section-divider--alt"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg-alt)"/></svg></div>
+
+    <!-- Instagram / Gallery Feed -->
+    <section class="section section-alt" id="gallery">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <span class="section-accent-line"></span>
+          <span class="section-tag">@devadecor</span>
+          <h2 class="section-title">Get Inspired</h2>
+          <p class="section-desc">Follow us on Instagram for daily inspiration and styling tips.</p>
+        </div>
+        <div class="gallery-grid" data-animate="stagger">
+          <a href="#" class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+          <a href="#" class="gallery-item gallery-item-tall">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=600&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+          <a href="#" class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+          <a href="#" class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+          <a href="#" class="gallery-item gallery-item-wide">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+          <a href="#" class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
+            <div class="gallery-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter-section" id="contact">
+      <div class="container">
+        <div class="newsletter-content" data-animate="scale-in">
+          <span class="section-tag">Stay Connected</span>
+          <h2 class="section-title">Join the Deva Family</h2>
+          <p>Subscribe for curated decor picks, styling tips, and exclusive Amazon deals delivered to your inbox.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <div class="newsletter-input-wrap">
+              <input type="email" placeholder="Your email address" required>
+              <button type="submit" class="btn btn-primary">Subscribe</button>
+            </div>
+            <p class="newsletter-note">By subscribing, you agree to our <a href="privacy.html">Privacy Policy</a>. Unsubscribe anytime.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col footer-brand">
+          <a href="index.html" class="footer-logo">
+            <span class="logo-text">DEVA</span>
+            <span class="logo-sub">DECOR</span>
+          </a>
+          <p>Transforming houses into homes with timeless, artisan-crafted decor since 2018.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </a>
+            <a href="#" aria-label="Pinterest">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.94-.2-2.4.04-3.44l1.4-5.96s-.36-.72-.36-1.78c0-1.66.97-2.9 2.17-2.9 1.02 0 1.52.77 1.52 1.7 0 1.03-.66 2.57-.99 4-.28 1.2.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.21 0 1.03.4 2.14.89 2.74a.36.36 0 0 1 .08.35l-.33 1.36c-.05.22-.18.27-.4.16-1.49-.7-2.42-2.88-2.42-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.6 7.46-6.22 7.46-1.22 0-2.36-.63-2.75-1.38l-.75 2.86c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0z"/></svg>
+            </a>
+            <a href="#" aria-label="Facebook">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </a>
+            <a href="#" aria-label="Twitter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <a href="shop.html">All Products</a>
+          <a href="shop.html">New Arrivals</a>
+          <a href="shop.html">Best Sellers</a>
+          <a href="shop.html">Sale</a>
+          <a href="shop.html">Deals</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="index.html#about">About Us</a>
+          <a href="journal.html">Journal</a>
+          <a href="contact.html">Careers</a>
+          <a href="contact.html">Press</a>
+          <a href="contact.html">Sustainability</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="contact.html">Contact Us</a>
+          <a href="contact.html">FAQ</a>
+          <a href="contact.html">Shipping &amp; Returns</a>
+          <a href="privacy.html">Privacy Policy</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Deva Decor. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Deva Decor",
+    "url": "https://devadecor.com",
+    "logo": "https://devadecor.com/logo.png",
+    "description": "Elevate your space with timeless, handcrafted home decor.",
+    "sameAs": [
+      "https://www.instagram.com/devadecor",
+      "https://www.pinterest.com/devadecor",
+      "https://www.facebook.com/devadecor"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-123-4567",
+      "contactType": "Customer Service",
+      "availableLanguage": "English"
+    }
+  }
+  </script>
+  <script src="js/app.js"></script>
+</body>
+</html>
