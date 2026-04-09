@@ -2,7 +2,7 @@
   "name": "Deva Decor — Timeless Home Decor",
   "short_name": "Deva Decor",
   "description": "Elevate your space with timeless, handcrafted home decor.",
-  "start_url": "/index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#faf8f5",
   "theme_color": "#b8976a",

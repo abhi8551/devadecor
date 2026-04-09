@@ -15,6 +15,14 @@
   const $ = (sel, ctx = document) => ctx.querySelector(sel);
   const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
+  function debounce(fn, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), wait);
+    };
+  }
+
   // Shared scroll bus — one rAF-throttled listener for all scroll-dependent features
   const scrollBus = {
     _cbs: [],
@@ -69,8 +77,8 @@
     if (!loader) return;
     setTimeout(() => {
       loader.classList.add('loaded');
-      setTimeout(() => loader.remove(), 600);
-    }, 800);
+      setTimeout(() => loader.remove(), 400);
+    }, 300);
   }
 
   // ─── Navbar ───
@@ -79,8 +87,15 @@
     const menu = $('#navMenu');
     const navbar = $('#navbar');
     if (hamburger && menu) {
-      hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); menu.classList.toggle('active'); });
-      $$('.nav-link', menu).forEach(link => link.addEventListener('click', () => { hamburger.classList.remove('active'); menu.classList.remove('active'); }));
+      function toggleMenu(open) {
+        const isOpen = open !== undefined ? open : !hamburger.classList.contains('active');
+        hamburger.classList.toggle('active', isOpen);
+        menu.classList.toggle('active', isOpen);
+        hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+      }
+      hamburger.addEventListener('click', () => toggleMenu());
+      $$('.nav-link', menu).forEach(link => link.addEventListener('click', () => toggleMenu(false)));
     }
     const shopDropdown = document.querySelector('.nav-item.has-dropdown');
     if (shopDropdown) {
@@ -126,11 +141,19 @@
     const toggle = $('#themeToggle');
     const saved = localStorage.getItem('devaTheme');
     if (saved) document.documentElement.setAttribute('data-theme', saved);
+    function updateToggleState() {
+      if (!toggle) return;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    }
+    updateToggleState();
     if (toggle) {
       toggle.addEventListener('click', () => {
         const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('devaTheme', next);
+        updateToggleState();
       });
     }
   }
@@ -143,19 +166,38 @@
     const close = $('#searchClose');
     const suggestions = $('#searchSuggestions');
     if (!toggle || !overlay) return;
-    function openSearch() { overlay.classList.add('active'); setTimeout(() => input?.focus(), 300); }
-    function closeSearch() { overlay.classList.remove('active'); if (input) input.value = ''; if (suggestions) suggestions.innerHTML = ''; }
+    let previousFocus = null;
+    function openSearch() {
+      previousFocus = document.activeElement;
+      overlay.removeAttribute('hidden');
+      overlay.classList.add('active');
+      toggle.setAttribute('aria-expanded', 'true');
+      setTimeout(() => input?.focus(), 300);
+    }
+    function closeSearch() {
+      overlay.classList.remove('active');
+      toggle.setAttribute('aria-expanded', 'false');
+      if (input) input.value = '';
+      if (suggestions) suggestions.innerHTML = '';
+      setTimeout(() => {
+        overlay.setAttribute('hidden', '');
+        if (previousFocus) previousFocus.focus();
+      }, 300);
+    }
     toggle.addEventListener('click', openSearch);
     if (close) close.addEventListener('click', closeSearch);
     overlay.addEventListener('click', e => { if (e.target === overlay) closeSearch(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay.classList.contains('active')) closeSearch();
+    });
     if (input && suggestions) {
-      input.addEventListener('input', () => {
+      const performSearch = debounce(() => {
         const q = input.value.toLowerCase().trim();
         if (q.length < 2) { suggestions.innerHTML = ''; return; }
         const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 5);
         suggestions.innerHTML = matches.length ? matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('') : '<div class="search-no-results">No products found</div>';
-      });
+      }, 200);
+      input.addEventListener('input', performSearch);
     }
   }
 
@@ -224,16 +266,43 @@
     attachCardEvents(track);
     const wrapper = track.closest('.carousel-wrapper');
     if (!wrapper) return;
+    const carousel = track.closest('.carousel');
     const prevBtn = wrapper.querySelector('.carousel-prev');
     const nextBtn = wrapper.querySelector('.carousel-next');
     const card = track.querySelector('.product-card');
     const scrollAmount = card ? card.offsetWidth + 24 : 300;
+
+    function updateScrollIndicator() {
+      if (!carousel) return;
+      const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
+      carousel.classList.toggle('at-end', isAtEnd);
+    }
+
+    track.addEventListener('scroll', updateScrollIndicator, { passive: true });
+    setTimeout(updateScrollIndicator, 100);
+
     if (prevBtn) prevBtn.addEventListener('click', () => track.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
     if (nextBtn) nextBtn.addEventListener('click', () => track.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
     if (autoScroll) {
-      let interval = setInterval(() => track.scrollBy({ left: scrollAmount, behavior: 'smooth' }), 5000);
+      let interval = setInterval(() => {
+        const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
+        if (isAtEnd) {
+          track.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+      }, 5000);
       wrapper.addEventListener('mouseenter', () => clearInterval(interval));
-      wrapper.addEventListener('mouseleave', () => { interval = setInterval(() => track.scrollBy({ left: scrollAmount, behavior: 'smooth' }), 5000); });
+      wrapper.addEventListener('mouseleave', () => { 
+        interval = setInterval(() => {
+          const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
+          if (isAtEnd) {
+            track.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+          }
+        }, 5000); 
+      });
     }
   }
 
@@ -242,13 +311,60 @@
   // ─── Hero Slideshow ───
   function initHeroSlideshow() {
     const slides = $$('.hero-slide');
+    const dots = $$('.hero-dot');
     if (slides.length < 2) return;
     let current = 0;
-    setInterval(() => {
+    let interval;
+
+    function goToSlide(index) {
       slides[current].classList.remove('active');
-      current = (current + 1) % slides.length;
+      dots[current]?.classList.remove('active');
+      current = index;
       slides[current].classList.add('active');
-    }, 6000);
+      dots[current]?.classList.add('active');
+    }
+
+    function nextSlide() {
+      goToSlide((current + 1) % slides.length);
+    }
+
+    function startAutoplay() {
+      interval = setInterval(nextSlide, 6000);
+    }
+
+    function stopAutoplay() {
+      clearInterval(interval);
+    }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        stopAutoplay();
+        goToSlide(i);
+        startAutoplay();
+      });
+    });
+
+    const hero = $('#hero');
+    if (hero) {
+      let touchStartX = 0;
+      hero.addEventListener('touchstart', e => {
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+      hero.addEventListener('touchend', e => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+          stopAutoplay();
+          if (diff > 0) {
+            goToSlide((current + 1) % slides.length);
+          } else {
+            goToSlide((current - 1 + slides.length) % slides.length);
+          }
+          startAutoplay();
+        }
+      }, { passive: true });
+    }
+
+    startAutoplay();
   }
 
   // ─── Scroll Animations ───
@@ -461,7 +577,7 @@
   // ─── Page Transitions ───
   function initPageTransitions() {
     if (!document.startViewTransition) return;
-    $$('a[href$=".html"]').forEach(link => {
+    $$('a[href^="/"]').forEach(link => {
       if (link.target === '_blank') return;
       link.addEventListener('click', e => {
         const href = link.getAttribute('href');
@@ -539,7 +655,7 @@
   function initHelpWidget() {
     const widget = document.createElement('div');
     widget.className = 'help-widget';
-    widget.innerHTML = `<button class="help-widget-trigger" aria-label="Need help?"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button><div class="help-widget-panel"><h4>Need Help?</h4><a href="contact.html#faq" class="help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ</a><a href="contact.html" class="help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contact Us</a></div>`;
+    widget.innerHTML = `<button class="help-widget-trigger" aria-label="Need help?"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button><div class="help-widget-panel"><h4>Need Help?</h4><a href="/contact#faq" class="help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>FAQ</a><a href="/contact" class="help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Contact Us</a><a href="https://wa.me/919251130947?text=Hi%2C%20I%20have%20a%20question%20about%20Deva%20Decor%20products" target="_blank" rel="noopener" class="help-link help-link--whatsapp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a></div>`;
     document.body.appendChild(widget);
     widget.querySelector('.help-widget-trigger').addEventListener('click', () => widget.classList.toggle('open'));
     document.addEventListener('click', e => { if (!widget.contains(e.target)) widget.classList.remove('open'); });
@@ -675,18 +791,23 @@
   // ─── Quick View Modal ───
   function initQuickView() {
     let overlay = null;
+    let previousFocus = null;
     function getProductImages(product) {
       if (product.images && product.images.length) return product.images;
       return [product.image];
     }
     function open(product) {
       if (overlay) overlay.remove();
+      previousFocus = document.activeElement;
       const desc = product.description || 'Beautifully crafted piece to elevate your living space.';
       const amazonLink = getAmazonLink(product);
       const savePct = product.comparePrice ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
       const images = getProductImages(product);
       overlay = document.createElement('div');
       overlay.className = 'quickview-overlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Quick view: ' + product.name);
       overlay.innerHTML = `
         <div class="quickview-modal">
           <button class="quickview-close" aria-label="Close quick view">&times;</button>
@@ -696,13 +817,13 @@
                 <img src="${images[0]}" alt="${product.name}" width="600" height="800" class="qv-main-img">
                 ${product.badge ? `<span class="product-card-badge">${product.badge}</span>` : ''}
               </div>
-              <div class="quickview-thumbs">
-                ${images.map((img, i) => `<button class="qv-thumb${i === 0 ? ' active' : ''}" data-idx="${i}"><img src="${img}" alt="View ${i + 1}" width="80" height="80"></button>`).join('')}
+              <div class="quickview-thumbs" role="group" aria-label="Product images">
+                ${images.map((img, i) => `<button class="qv-thumb${i === 0 ? ' active' : ''}" data-idx="${i}" aria-label="View image ${i + 1} of ${images.length}"><img src="${img}" alt="" width="80" height="80"></button>`).join('')}
               </div>
             </div>
             <div class="quickview-details">
               <span class="quickview-category">${product.category}</span>
-              <h2 class="quickview-title">${product.name}</h2>
+              <h2 class="quickview-title" id="qv-title">${product.name}</h2>
               ${renderStars(product.rating)}
               <div class="quickview-price">
                 <span class="current">${product.currency || '₹'}${product.price}</span>
@@ -720,6 +841,8 @@
       document.body.appendChild(overlay);
       document.body.style.overflow = 'hidden';
       requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
+      const closeBtn = overlay.querySelector('.quickview-close');
+      setTimeout(() => closeBtn.focus(), 100);
       const mainImg = overlay.querySelector('.qv-main-img');
       overlay.querySelectorAll('.qv-thumb').forEach(thumb => {
         thumb.addEventListener('click', () => {
@@ -729,7 +852,7 @@
           setTimeout(() => { mainImg.src = images[parseInt(thumb.dataset.idx, 10)]; mainImg.style.opacity = '1'; }, 180);
         });
       });
-      overlay.querySelector('.quickview-close').addEventListener('click', close);
+      closeBtn.addEventListener('click', close);
       overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
       document.addEventListener('keydown', onEsc);
     }
@@ -738,7 +861,10 @@
       overlay.classList.remove('visible');
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onEsc);
-      setTimeout(() => { if (overlay) { overlay.remove(); overlay = null; } }, 400);
+      setTimeout(() => {
+        if (overlay) { overlay.remove(); overlay = null; }
+        if (previousFocus) previousFocus.focus();
+      }, 400);
     }
     function onEsc(e) { if (e.key === 'Escape') close(); }
     document.addEventListener('click', e => {
@@ -784,7 +910,7 @@
     banner.className = 'cookie-banner';
     banner.innerHTML = `
       <div class="cookie-banner-inner">
-        <p>We use cookies to enhance your experience and analyze site traffic. By continuing, you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
+        <p>We use cookies to enhance your experience and analyze site traffic. By continuing, you agree to our <a href="/privacy">Privacy Policy</a>.</p>
         <div class="cookie-banner-actions">
           <button class="btn btn-primary cookie-accept">Accept</button>
           <button class="btn btn-outline cookie-decline">Decline</button>
@@ -809,7 +935,7 @@
     const KEY = 'dd_recently_viewed';
     const params = new URLSearchParams(window.location.search);
     const pid = parseInt(params.get('id'), 10);
-    if (pid && window.location.pathname.includes('product.html')) {
+    if (pid && window.location.pathname.includes('products')) {
       let viewed = JSON.parse(localStorage.getItem(KEY) || '[]');
       viewed = viewed.filter(id => id !== pid);
       viewed.unshift(pid);
@@ -938,11 +1064,11 @@
     nav.className = 'mobile-bottom-nav';
     const wishlistCount = JSON.parse(localStorage.getItem('dd_wishlist') || '[]').length;
     nav.innerHTML = `
-      <a href="index.html" class="mobile-nav-item${window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('/') ? ' active' : ''}">
+      <a href="/" class="mobile-nav-item${window.location.pathname === '/' || window.location.pathname === '/index.html' ? ' active' : ''}">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <span>Home</span>
       </a>
-      <a href="shop.html" class="mobile-nav-item${window.location.pathname.includes('shop') ? ' active' : ''}">
+      <a href="/shop" class="mobile-nav-item${window.location.pathname.includes('shop') ? ' active' : ''}">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         <span>Shop</span>
       </a>
@@ -965,7 +1091,7 @@
     const wishlistBtn = nav.querySelector('#mobileNavWishlist');
     if (wishlistBtn) wishlistBtn.addEventListener('click', e => {
       e.preventDefault();
-      window.location.href = 'shop.html';
+      window.location.href = '/shop';
     });
   }
 
@@ -1014,7 +1140,7 @@
   // ─── Scroll-Triggered Promo Banner ───
   function initPromoBanner() {
     if (sessionStorage.getItem('dd_promo_dismissed')) return;
-    if (!window.location.pathname.endsWith('index.html') && !window.location.pathname.endsWith('/')) return;
+    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') return;
     function onScroll(scrollY, docH, winH) {
       const h = docH - winH;
       if (h <= 0 || scrollY / h < 0.55) return;
@@ -1024,7 +1150,7 @@
       banner.innerHTML = `
         <div class="promo-banner-inner">
           <span>Curated Home Decor &mdash; Fulfilled by Amazon India</span>
-          <a href="shop.html" class="btn btn-primary btn-sm">Browse Collection</a>
+          <a href="/shop" class="btn btn-primary btn-sm">Browse Collection</a>
           <button class="promo-banner-close" aria-label="Dismiss">&times;</button>
         </div>`;
       document.body.appendChild(banner);
@@ -1173,7 +1299,7 @@
   async function loadProductData() {
     catalogLoadFailed = false;
     try {
-      const res = await fetch('js/products.json');
+      const res = await fetch('/js/products.json');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       if (!data || !Array.isArray(data.products)) throw new Error('Invalid catalog');
@@ -1203,7 +1329,7 @@
     const cats = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
     cats.forEach(function (cat) {
       const a = document.createElement('a');
-      a.href = 'shop.html?cat=' + encodeURIComponent(cat.toLowerCase().replace(/\s+/g, '-'));
+      a.href = '/shop?cat=' + encodeURIComponent(cat.toLowerCase().replace(/\s+/g, '-'));
       a.textContent = cat;
       col.appendChild(a);
     });
@@ -1212,28 +1338,10 @@
   // ─── Initialize ───
   async function init() {
     initLoader();
-    await loadProductData();
-    showCatalogErrorBanner();
-    const statProductCount = $('#statProductCount');
-    if (statProductCount) statProductCount.textContent = String(products.length);
-    initDynamicNavCategories();
+
     initNavbar();
     initTheme();
     initSearch();
-
-    initCarousel('featuredTrack', products, true);
-    initCarousel('favoritesTrack', favoriteProducts, false);
-    const relatedEl = document.getElementById('relatedTrack');
-    if (relatedEl) {
-      const params = new URLSearchParams(window.location.search);
-      const pid = parseInt(params.get('id'), 10);
-      const current = products.find(p => p.id === pid);
-      const related = current
-        ? products.filter(p => p.id !== current.id && p.category === current.category).concat(products.filter(p => p.category !== (current && current.category))).slice(0, 8)
-        : products.slice(0, 8);
-      initCarousel('relatedTrack', related, false);
-    }
-
     initHeroSlideshow();
     initScrollAnimations();
     initSplitText();
@@ -1251,12 +1359,10 @@
     initSocialShare();
     initClickTracking();
     initCursor();
-    initCardTilt();
     initRipple();
     initLazyReveal();
     initSectionParallax();
     initHelpWidget();
-    initQuickView();
     initCarouselEnhancements();
     initFloatingLabels();
     initMobileNav();
@@ -1268,9 +1374,32 @@
     initEmptyStates();
     initKeyboardShortcuts();
     initCookieConsent();
+    registerSW();
+
+    await loadProductData();
+    showCatalogErrorBanner();
+
+    const statProductCount = $('#statProductCount');
+    if (statProductCount) statProductCount.textContent = String(products.length);
+    initDynamicNavCategories();
+
+    initCarousel('featuredTrack', products, true);
+    initCarousel('favoritesTrack', favoriteProducts, false);
+    const relatedEl = document.getElementById('relatedTrack');
+    if (relatedEl) {
+      const params = new URLSearchParams(window.location.search);
+      const pid = parseInt(params.get('id'), 10);
+      const current = products.find(p => p.id === pid);
+      const related = current
+        ? products.filter(p => p.id !== current.id && p.category === current.category).concat(products.filter(p => p.category !== (current && current.category))).slice(0, 8)
+        : products.slice(0, 8);
+      initCarousel('relatedTrack', related, false);
+    }
+
+    initCardTilt();
+    initQuickView();
     initRecentlyViewed();
     initWishlist();
-    registerSW();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

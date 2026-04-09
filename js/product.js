@@ -1,6 +1,6 @@
 /* ============================================
    DEVA DECOR — Product Page Module
-   Loaded only on product.html
+   Loaded only on products page
    ============================================ */
 
 (function () {
@@ -142,12 +142,12 @@
     const breadcrumb = $('.breadcrumb .container');
     if (breadcrumb) {
       const catSlug = product.category.toLowerCase().replace(/\s+/g, '-');
-      breadcrumb.innerHTML = `<a href="index.html">Home</a><span>/</span><a href="shop.html?cat=${catSlug}">${product.category}</a><span>/</span><span>${product.name}</span>`;
+      breadcrumb.innerHTML = `<a href="/">Home</a><span>/</span><a href="/shop?cat=${catSlug}">${product.category}</a><span>/</span><span>${product.name}</span>`;
     }
 
     document.title = product.name + ' — Deva Decor';
 
-    const canonicalUrl = new URL('product.html', window.location.href);
+    const canonicalUrl = new URL('products', window.location.origin);
     canonicalUrl.search = 'id=' + encodeURIComponent(String(product.id));
     const canonicalHref = canonicalUrl.href.split('#')[0];
     const canonicalEl = document.getElementById('canonicalLink');
@@ -157,7 +157,8 @@
 
     const ogImage = document.querySelector('meta[property="og:image"]');
     if (ogImage && product.image) {
-      ogImage.setAttribute('content', window.location.origin + '/' + product.image);
+      const imgPath = product.image.startsWith('/') ? product.image : '/' + product.image;
+      ogImage.setAttribute('content', window.location.origin + imgPath);
     }
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) ogTitle.setAttribute('content', product.name + ' — Deva Decor');
@@ -166,11 +167,12 @@
       ogDesc.setAttribute('content', product.bullets[0]);
     }
 
+    var schemaImgPath = product.image ? (product.image.startsWith('/') ? product.image : '/' + product.image) : '';
     var schema = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       'name': product.name,
-      'image': window.location.origin + '/' + (product.image || ''),
+      'image': window.location.origin + schemaImgPath,
       'description': product.description || product.name,
       'brand': { '@type': 'Brand', 'name': product.brand || 'Deva Decor' }
     };
@@ -203,12 +205,44 @@
     const zoom = $('#galleryZoom');
     if (zoom) {
       zoom.addEventListener('click', () => {
+        const previousFocus = document.activeElement;
         const overlay = document.createElement('div');
         overlay.className = 'gallery-lightbox';
-        overlay.innerHTML = `<img src="${main.src}" alt="Zoomed view"><button class="gallery-lightbox-close" aria-label="Close">&times;</button>`;
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', 'Zoomed product image');
+        overlay.innerHTML = `<img src="${main.src}" alt="Zoomed view"><button class="gallery-lightbox-close" aria-label="Close lightbox">&times;</button>`;
         document.body.appendChild(overlay);
-        requestAnimationFrame(() => overlay.classList.add('active'));
-        overlay.addEventListener('click', () => { overlay.classList.remove('active'); setTimeout(() => overlay.remove(), 300); });
+        const closeBtn = overlay.querySelector('.gallery-lightbox-close');
+        requestAnimationFrame(() => {
+          overlay.classList.add('active');
+          closeBtn.focus();
+        });
+        function closeLightbox() {
+          overlay.classList.remove('active');
+          setTimeout(() => {
+            overlay.remove();
+            if (previousFocus) previousFocus.focus();
+          }, 300);
+        }
+        function onKeydown(e) {
+          if (e.key === 'Escape') {
+            closeLightbox();
+            document.removeEventListener('keydown', onKeydown);
+          }
+        }
+        document.addEventListener('keydown', onKeydown);
+        closeBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          closeLightbox();
+          document.removeEventListener('keydown', onKeydown);
+        });
+        overlay.addEventListener('click', e => {
+          if (e.target === overlay) {
+            closeLightbox();
+            document.removeEventListener('keydown', onKeydown);
+          }
+        });
       });
     }
   }

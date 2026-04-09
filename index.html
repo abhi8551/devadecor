@@ -16,7 +16,7 @@
   <meta property="og:title" content="Deva Decor — Timeless Home Decor">
   <meta property="og:description" content="Deva Decor — Elevate your space with timeless, handcrafted home decor. Shop wall art, lighting, furniture, vases, rugs & mirrors.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=630&fit=crop">
-  <meta property="og:url" content="https://devadecor.com/index.html">
+  <meta property="og:url" content="https://devadecor.com/">
   <meta name="twitter:card" content="summary_large_image">
   <title>Deva Decor — Timeless Home Decor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
-  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop" fetchpriority="high">
+  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=675&fit=crop&fm=webp&q=80" fetchpriority="high" imagesrcset="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=640&h=360&fit=crop&fm=webp&q=80 640w, https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1024&h=576&fit=crop&fm=webp&q=80 1024w, https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1440&h=810&fit=crop&fm=webp&q=80 1440w, https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop&fm=webp&q=80 1920w" imagesizes="100vw">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -44,14 +44,14 @@
   <!-- Navbar -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
-      <a href="index.html" class="nav-logo">
+      <a href="/" class="nav-logo">
         <span class="logo-text">DEVA</span>
         <span class="logo-sub">DECOR</span>
       </a>
 
       <ul class="nav-menu" id="navMenu">
         <li class="nav-item has-dropdown">
-          <a href="shop.html" class="nav-link">Shop</a>
+          <a href="/shop" class="nav-link">Shop</a>
           <div class="dropdown-menu mega-dropdown">
             <div class="dropdown-grid">
               <div class="dropdown-col" id="navCategoryLinks">
@@ -59,15 +59,15 @@
               </div>
               <div class="dropdown-col">
                 <h4>Inspiration</h4>
-                <a href="shop.html">New Arrivals</a>
-                <a href="shop.html">Best Sellers</a>
-                <a href="room-living.html">Living Room</a>
-                <a href="room-bedroom.html">Bedroom</a>
-                <a href="room-dining.html">Dining Room</a>
+                <a href="/shop?filter=new">New Arrivals</a>
+                <a href="/shop?filter=bestseller">Best Sellers</a>
+                <a href="/room-living">Living Room</a>
+                <a href="/room-bedroom">Bedroom</a>
+                <a href="/room-dining">Dining Room</a>
               </div>
               <div class="dropdown-col dropdown-featured">
                 <div class="dropdown-card">
-                  <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop" alt="New Collection" loading="lazy">
+                  <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop&fm=webp&q=80" alt="New Collection" loading="lazy" width="300" height="200">
                   <h4>The Spring Collection</h4>
                   <p>Discover fresh designs</p>
                 </div>
@@ -75,29 +75,30 @@
             </div>
           </div>
         </li>
-        <li class="nav-item"><a href="room-living.html" class="nav-link">Inspiration</a></li>
+        <li class="nav-item"><a href="/room-living" class="nav-link">Inspiration</a></li>
         <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-        <li class="nav-item"><a href="journal.html" class="nav-link">Journal</a></li>
-        <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+        <li class="nav-item"><a href="/journal" class="nav-link">Journal</a></li>
+        <li class="nav-item"><a href="/contact" class="nav-link">Contact</a></li>
       </ul>
 
       <div class="nav-actions">
-        <button class="nav-action-btn search-toggle" id="searchToggle" aria-label="Search">
+        <button class="nav-action-btn search-toggle" id="searchToggle" aria-label="Open search" aria-controls="searchOverlay" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
-        <button class="nav-action-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <button class="nav-action-btn theme-toggle" id="themeToggle" aria-label="Toggle dark mode" aria-pressed="false">
           <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
           <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <button class="nav-hamburger" id="navHamburger" aria-label="Menu">
+        <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-controls="navMenu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
 
     <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay">
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Search products" hidden>
       <div class="search-container">
+        <label for="searchInput" class="visually-hidden">Search products</label>
         <input type="text" class="search-input" id="searchInput" placeholder="Search for products, collections..." autocomplete="off">
         <button class="search-close" id="searchClose" aria-label="Close search">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -112,13 +113,28 @@
     <section class="hero" id="hero">
       <div class="hero-bg">
         <div class="hero-slide active">
-          <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop" alt="Elegant living room decor" loading="eager" fetchpriority="high" width="1920" height="1080">
+          <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=675&fit=crop&fm=webp&q=80" 
+               srcset="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=640&h=360&fit=crop&fm=webp&q=80 640w,
+                       https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1024&h=576&fit=crop&fm=webp&q=80 1024w,
+                       https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1440&h=810&fit=crop&fm=webp&q=80 1440w,
+                       https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop&fm=webp&q=80 1920w"
+               sizes="100vw" alt="Elegant living room decor" loading="eager" fetchpriority="high" width="1920" height="1080">
         </div>
         <div class="hero-slide">
-          <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&h=1080&fit=crop" alt="Modern interior design" loading="lazy" width="1920" height="1080">
+          <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&h=675&fit=crop&fm=webp&q=80" 
+               srcset="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=640&h=360&fit=crop&fm=webp&q=80 640w,
+                       https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1024&h=576&fit=crop&fm=webp&q=80 1024w,
+                       https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1440&h=810&fit=crop&fm=webp&q=80 1440w,
+                       https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&h=1080&fit=crop&fm=webp&q=80 1920w"
+               sizes="100vw" alt="Modern interior design" loading="lazy" width="1920" height="1080">
         </div>
         <div class="hero-slide">
-          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&h=1080&fit=crop" alt="Luxury home styling" loading="lazy" width="1920" height="1080">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=675&fit=crop&fm=webp&q=80" 
+               srcset="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=640&h=360&fit=crop&fm=webp&q=80 640w,
+                       https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1024&h=576&fit=crop&fm=webp&q=80 1024w,
+                       https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1440&h=810&fit=crop&fm=webp&q=80 1440w,
+                       https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&h=1080&fit=crop&fm=webp&q=80 1920w"
+               sizes="100vw" alt="Luxury home styling" loading="lazy" width="1920" height="1080">
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-grain"></div>
@@ -128,13 +144,18 @@
         <h1 class="hero-title">Elevate Your Space<br>with Timeless Decor</h1>
         <p class="hero-subtitle">Handcrafted pieces that transform houses into homes. Curated with intention, designed to inspire.</p>
         <div class="hero-actions">
-          <a href="shop.html" class="btn btn-primary btn-lg">Shop Now</a>
-          <a href="room-living.html" class="btn btn-outline-light btn-lg">Explore Rooms</a>
+          <a href="/shop" class="btn btn-primary btn-lg">Shop Now</a>
+          <a href="/room-living" class="btn btn-outline-light btn-lg">Explore Rooms</a>
         </div>
       </div>
       <div class="hero-scroll">
         <span>Scroll</span>
         <div class="scroll-line"></div>
+      </div>
+      <div class="hero-indicators">
+        <button class="hero-dot active" data-slide="0" aria-label="Slide 1"></button>
+        <button class="hero-dot" data-slide="1" aria-label="Slide 2"></button>
+        <button class="hero-dot" data-slide="2" aria-label="Slide 3"></button>
       </div>
     </section>
 
@@ -233,29 +254,45 @@
           <p class="section-desc">Thoughtfully curated collections to match every aesthetic and mood.</p>
         </div>
         <div class="collections-grid" data-animate="fade-up">
-          <a href="shop.html" class="collection-card collection-card-lg">
-            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop" alt="Modern Minimalism" loading="lazy">
+          <a href="/shop" class="collection-card collection-card-lg">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&h=450&fit=crop&fm=webp&q=80" 
+                 srcset="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop&fm=webp&q=80 400w,
+                         https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&h=450&fit=crop&fm=webp&q=80 600w,
+                         https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop&fm=webp&q=80 800w"
+                 sizes="(max-width: 768px) 100vw, 50vw" alt="Modern Minimalism" loading="lazy" width="800" height="600">
             <div class="collection-overlay">
               <h3>Modern Minimalism</h3>
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="shop.html" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=400&fit=crop" alt="Warm & Cozy" loading="lazy">
+          <a href="/shop" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=267&fit=crop&fm=webp&q=80" 
+                 srcset="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop&fm=webp&q=80 300w,
+                         https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=267&fit=crop&fm=webp&q=80 400w,
+                         https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=400&fit=crop&fm=webp&q=80 600w"
+                 sizes="(max-width: 768px) 100vw, 25vw" alt="Warm & Cozy" loading="lazy" width="600" height="400">
             <div class="collection-overlay">
               <h3>Warm & Cozy</h3>
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="shop.html" class="collection-card">
-            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop" alt="Scandi Living" loading="lazy">
+          <a href="/shop" class="collection-card">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=267&fit=crop&fm=webp&q=80" 
+                 srcset="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=300&h=200&fit=crop&fm=webp&q=80 300w,
+                         https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=267&fit=crop&fm=webp&q=80 400w,
+                         https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop&fm=webp&q=80 600w"
+                 sizes="(max-width: 768px) 100vw, 25vw" alt="Scandi Living" loading="lazy" width="600" height="400">
             <div class="collection-overlay">
               <h3>Scandi Living</h3>
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="shop.html" class="collection-card collection-card-lg">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop" alt="Luxury Living" loading="lazy">
+          <a href="/shop" class="collection-card collection-card-lg">
+            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=450&fit=crop&fm=webp&q=80" 
+                 srcset="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop&fm=webp&q=80 400w,
+                         https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=450&fit=crop&fm=webp&q=80 600w,
+                         https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop&fm=webp&q=80 800w"
+                 sizes="(max-width: 768px) 100vw, 50vw" alt="Luxury Living" loading="lazy" width="800" height="600">
             <div class="collection-overlay">
               <h3>Luxury Living</h3>
               <span class="collection-link">View Collection →</span>
@@ -271,10 +308,18 @@
         <div class="about-grid" data-animate="fade-left">
           <div class="about-images">
             <div class="about-img-main">
-              <img src="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=600&h=750&fit=crop" alt="Artisan crafting decor" loading="lazy">
+              <img src="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=450&h=563&fit=crop&fm=webp&q=80" 
+                   srcset="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=300&h=375&fit=crop&fm=webp&q=80 300w,
+                           https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=450&h=563&fit=crop&fm=webp&q=80 450w,
+                           https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=600&h=750&fit=crop&fm=webp&q=80 600w"
+                   sizes="(max-width: 768px) 80vw, 30vw" alt="Artisan crafting decor" loading="lazy" width="600" height="750">
             </div>
             <div class="about-img-accent">
-              <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop" alt="Decor detail" loading="lazy">
+              <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=267&fit=crop&fm=webp&q=80" 
+                   srcset="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=150&h=200&fit=crop&fm=webp&q=80 150w,
+                           https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200&h=267&fit=crop&fm=webp&q=80 200w,
+                           https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=400&fit=crop&fm=webp&q=80 300w"
+                   sizes="(max-width: 768px) 40vw, 15vw" alt="Decor detail" loading="lazy" width="300" height="400">
             </div>
           </div>
           <div class="about-content">
@@ -300,7 +345,7 @@
                 <span class="stat-label">Average Rating</span>
               </div>
             </div>
-            <a href="contact.html" class="btn btn-primary">Learn More</a>
+            <a href="/contact" class="btn btn-primary">Learn More</a>
           </div>
         </div>
       </div>
@@ -340,10 +385,10 @@
 
     <!-- Parallax Banner -->
     <section class="parallax-banner">
-      <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&h=800&fit=crop')"></div>
+      <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1440&h=600&fit=crop&fm=webp&q=80')"></div>
       <div class="parallax-content" data-animate="blur-in">
         <h2>Transform Every Room<br>Into a Sanctuary</h2>
-        <a href="shop.html" class="btn btn-primary btn-lg">Discover More</a>
+        <a href="/shop" class="btn btn-primary btn-lg">Discover More</a>
       </div>
     </section>
 
@@ -364,20 +409,20 @@
       </div>
     </section>
 
-    <!-- Newsletter (hidden until Formspree is configured — remove style="display:none" to re-enable) -->
-    <section class="newsletter-section" id="contact" style="display:none">
+    <!-- Newsletter Section -->
+    <section class="newsletter-section" id="newsletter">
       <div class="container">
         <div class="newsletter-content" data-animate="scale-in">
           <span class="section-tag">Stay Connected</span>
           <h2 class="section-title">Join the Deva Family</h2>
           <p>Subscribe for curated decor picks, styling tips, and exclusive Amazon deals delivered to your inbox.</p>
-          <!-- Replace YOUR_NEWSLETTER_FORM_ID with your Formspree form id (dashboard → Integration → form endpoint). -->
-          <form class="newsletter-form" id="newsletterForm" method="post" action="https://formspree.io/f/YOUR_NEWSLETTER_FORM_ID">
+          <form class="newsletter-form" id="newsletterForm" method="post" action="https://formspree.io/f/xpwzgvkr">
             <div class="newsletter-input-wrap">
-              <input type="email" placeholder="Your email address" required>
+              <label for="newsletterEmail" class="visually-hidden">Email address</label>
+              <input type="email" id="newsletterEmail" name="email" placeholder="Your email address" required autocomplete="email">
               <button type="submit" class="btn btn-primary">Subscribe</button>
             </div>
-            <p class="newsletter-note">By subscribing, you agree to our <a href="privacy.html">Privacy Policy</a>. Unsubscribe anytime.</p>
+            <p class="newsletter-note">By subscribing, you agree to our <a href="/privacy">Privacy Policy</a>. Unsubscribe anytime.</p>
           </form>
         </div>
       </div>
@@ -389,7 +434,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col footer-brand">
-          <a href="index.html" class="footer-logo">
+          <a href="/" class="footer-logo">
             <span class="logo-text">DEVA</span>
             <span class="logo-sub">DECOR</span>
           </a>
@@ -397,20 +442,20 @@
         </div>
         <div class="footer-col">
           <h4>Shop</h4>
-          <a href="shop.html">All Products</a>
+          <a href="/shop">All Products</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
-          <a href="index.html#about">About Us</a>
-          <a href="journal.html">Journal</a>
-          <a href="contact.html">Contact</a>
+          <a href="/#about">About Us</a>
+          <a href="/journal">Journal</a>
+          <a href="/contact">Contact</a>
         </div>
         <div class="footer-col">
           <h4>Support</h4>
-          <a href="contact.html">Contact Us</a>
-          <a href="contact.html#faq">FAQ</a>
-          <a href="contact.html">Shipping &amp; Returns</a>
-          <a href="privacy.html">Privacy Policy</a>
+          <a href="/contact">Contact Us</a>
+          <a href="/contact#faq">FAQ</a>
+          <a href="/contact">Shipping &amp; Returns</a>
+          <a href="/privacy">Privacy Policy</a>
         </div>
       </div>
       <div class="footer-bottom">
@@ -426,11 +471,27 @@
     "@type": "Organization",
     "name": "Deva Decor",
     "url": "https://devadecor.com",
-    "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E",
+    "logo": "https://devadecor.com/images/logo.png",
     "description": "Elevate your space with timeless, handcrafted home decor.",
-    "sameAs": []
+    "sameAs": [
+      "https://www.instagram.com/devadecor",
+      "https://www.facebook.com/devadecor",
+      "https://www.pinterest.com/devadecor"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-9251130947",
+      "contactType": "customer service",
+      "availableLanguage": ["English", "Hindi"]
+    }
   }
   </script>
+  <!-- WhatsApp Bulk Inquiry Button -->
+  <a href="https://wa.me/919251130947?text=Hi%2C%20I%27m%20interested%20in%20bulk%20orders%20from%20Deva%20Decor" target="_blank" rel="noopener" class="whatsapp-bulk-btn" aria-label="WhatsApp for bulk orders">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span>Bulk Orders</span>
+  </a>
+
   <script src="js/app.js"></script>
   <script>
     (function() {
@@ -452,7 +513,7 @@
         grid.innerHTML = catNames.map(function(name) {
           var slug = name.toLowerCase().replace(/\s+/g, '-');
           var img = cats[name];
-          return '<a href="shop.html?cat=' + slug + '" class="category-card" data-animate="clip-reveal">' +
+          return '<a href="/shop?cat=' + slug + '" class="category-card" data-animate="clip-reveal">' +
             '<div class="category-img">' +
             '<img src="' + img + '" alt="' + name + '" loading="lazy" width="600" height="700">' +
             '</div>' +

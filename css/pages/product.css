@@ -299,8 +299,16 @@
 
 .product-actions {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 28px;
+}
+.product-actions .btn-full {
+  width: 100%;
+}
+.product-actions .price-disclaimer,
+.product-actions .affiliate-disclosure {
+  margin: 0;
 }
 
 .add-to-cart-btn {
@@ -1030,11 +1038,33 @@
 @media (max-width: 480px) {
   .trust-strip { grid-template-columns: repeat(2, 1fr); }
 
-  .product-actions {
-    flex-direction: column;
-  }
-
   .product-actions .btn-icon {
     width: 100%;
   }
+}
+
+/* --- WhatsApp Bulk Order Button --- */
+.btn-whatsapp-bulk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid #25D366;
+  color: #25D366;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.btn-whatsapp-bulk:hover {
+  background: #25D366;
+  color: #fff;
+}
+.btn-whatsapp-bulk svg {
+  flex-shrink: 0;
 }
