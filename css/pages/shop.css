@@ -122,11 +122,25 @@
 .view-btn:hover:not(.active) { background: var(--color-bg-alt); }
 
 .products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.category-group-title {
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border, #e5e2db);
+}
+.category-group-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
 }
-.products-grid .product-card {
+.category-group-grid .product-card {
   flex: none;
 }
 

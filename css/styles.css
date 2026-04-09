@@ -42,6 +42,52 @@
   --container-padding: 24px;
 }
 
+/* Catalog failed to load */
+.catalog-load-banner {
+  background: var(--color-accent-light);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.catalog-load-banner p {
+  margin: 0;
+  max-width: 42rem;
+  margin-inline: auto;
+}
+
+/* Unknown shop category filter */
+.shop-cat-notice {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+.shop-cat-notice a {
+  color: var(--color-accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #141210;
+    --color-bg-alt: #1c1a17;
+    --color-surface: #222019;
+    --color-text: #f0ece6;
+    --color-text-secondary: #b0a898;
+    --color-text-muted: #7a7268;
+    --color-text-light: #9a9a9a;
+    --color-accent: #d4ad6e;
+    --color-accent-hover: #e4c08e;
+    --color-accent-light: rgba(212, 173, 110, 0.12);
+    --color-border: #2e2a24;
+    --color-border-light: #252220;
+    --color-overlay: rgba(0, 0, 0, 0.7);
+  }
+}
+
 /* --- Dark Theme --- */
 [data-theme="dark"] {
   --color-bg: #141210;
@@ -1022,6 +1068,12 @@ h1, h2, h3, h4, h5 {
   color: var(--color-text-muted);
 }
 
+.price-check-amazon {
+  font-size: 0.85rem;
+  color: var(--color-primary, #b8976a);
+  font-weight: 500;
+}
+
 /* --- Carousel --- */
 .carousel-wrapper {
   position: relative;
@@ -1532,6 +1584,25 @@ h1, h2, h3, h4, h5 {
   border-radius: 4px;
 }
 
+.testimonials-carousel--simple .testimonial-track {
+  justify-content: center;
+  transform: none !important;
+}
+
+.testimonials-trust-message {
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 32px 24px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
 /* --- Gallery / Instagram --- */
 .gallery-grid {
   display: grid;
@@ -1759,8 +1830,10 @@ h1, h2, h3, h4, h5 {
 
 .footer-bottom {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   padding-top: 24px;
   border-top: 1px solid var(--color-border);
   font-size: 0.8125rem;

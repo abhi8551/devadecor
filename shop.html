@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#b8976a">
-  <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
+  <!-- Google Analytics — uncomment and replace G-XXXXXXXXXX with your Measurement ID
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.svg">
   <link rel="canonical" href="https://devadecor.com/shop.html">
@@ -25,7 +26,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://formspree.io https://www.google-analytics.com; frame-src 'none';">
   <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/pages/shop.css">
   <style>
@@ -49,7 +51,7 @@
       .filter-sidebar-close { display: flex; }
       #filterSidebar { padding-top: 52px; }
     }
-    .products-grid--list {
+    .products-grid--list .category-group-grid {
       grid-template-columns: 1fr;
     }
     .products-grid--list .product-card {
@@ -95,15 +97,8 @@
           <a href="shop.html" class="nav-link">Shop</a>
           <div class="dropdown-menu mega-dropdown">
             <div class="dropdown-grid">
-              <div class="dropdown-col">
+              <div class="dropdown-col" id="navCategoryLinks">
                 <h4>Categories</h4>
-                <a href="shop.html?cat=wall-art">Wall Art</a>
-                <a href="shop.html?cat=lighting">Lighting</a>
-                <a href="shop.html?cat=furniture">Furniture</a>
-                <a href="shop.html?cat=vases">Vases</a>
-                <a href="shop.html?cat=rugs">Rugs</a>
-                <a href="shop.html?cat=mirrors">Mirrors</a>
-                <a href="shop.html?cat=textiles">Textiles</a>
               </div>
               <div class="dropdown-col">
                 <h4>Inspiration</h4>
@@ -173,36 +168,18 @@
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
 
-          <div class="filter-section">
+          <div class="filter-section" id="categoryFilterSection">
             <h4>Categories</h4>
-            <label class="filter-check"><input type="checkbox" name="category" value="Wall Art"> Wall Art</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Lighting"> Lighting</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Furniture"> Furniture</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Vases"> Vases</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Rugs"> Rugs</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Mirrors"> Mirrors</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Textiles"> Textiles</label>
-            <label class="filter-check"><input type="checkbox" name="category" value="Other"> Other</label>
           </div>
 
           <div class="filter-section">
             <h4>Price</h4>
             <div class="price-range">
-              <span class="price-range-label" id="priceRangeLabel">$500</span>
-              <input type="range" id="priceRange" min="0" max="500" step="10" value="500" aria-label="Maximum price">
+              <span class="price-range-label" id="priceRangeLabel">—</span>
+              <input type="range" id="priceRange" min="0" max="10000" step="10" value="10000" aria-label="Maximum price">
             </div>
           </div>
 
-          <div class="filter-section">
-            <h4>Color</h4>
-            <div class="color-swatches" id="colorFilterSwatches" role="group" aria-label="Filter by color">
-              <button type="button" class="swatch filter-swatch" data-color="Neutral" style="background:#d4cfc4" title="Neutral" aria-label="Neutral"></button>
-              <button type="button" class="swatch filter-swatch" data-color="Gold" style="background:#c9a227" title="Gold" aria-label="Gold"></button>
-              <button type="button" class="swatch filter-swatch" data-color="Black" style="background:#2a2a2a" title="Black" aria-label="Black"></button>
-              <button type="button" class="swatch filter-swatch" data-color="White" style="background:#f5f2eb;border:1px solid var(--color-border)" title="White" aria-label="White"></button>
-              <button type="button" class="swatch filter-swatch" data-color="Earth" style="background:#8b7355" title="Earth" aria-label="Earth"></button>
-            </div>
-          </div>
         </aside>
 
         <div class="shop-main">
@@ -232,6 +209,8 @@
           </div>
 
           <div class="active-filters" id="activeFilters" hidden></div>
+
+          <div id="shopCatNotice" class="shop-cat-notice" hidden></div>
 
           <div class="products-grid" id="productsGrid">
             <div class="shop-skeleton-grid" id="shopSkeleton">
@@ -264,47 +243,28 @@
             <span class="logo-sub">DECOR</span>
           </a>
           <p>Transforming houses into homes with timeless, artisan-crafted decor since 2018.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </a>
-            <a href="#" aria-label="Pinterest">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.94-.2-2.4.04-3.44l1.4-5.96s-.36-.72-.36-1.78c0-1.66.97-2.9 2.17-2.9 1.02 0 1.52.77 1.52 1.7 0 1.03-.66 2.57-.99 4-.28 1.2.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.21 0 1.03.4 2.14.89 2.74a.36.36 0 0 1 .08.35l-.33 1.36c-.05.22-.18.27-.4.16-1.49-.7-2.42-2.88-2.42-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.6 7.46-6.22 7.46-1.22 0-2.36-.63-2.75-1.38l-.75 2.86c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0z"/></svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-            </a>
-          </div>
         </div>
         <div class="footer-col">
           <h4>Shop</h4>
           <a href="shop.html">All Products</a>
-          <a href="shop.html">New Arrivals</a>
-          <a href="shop.html">Best Sellers</a>
-          <a href="shop.html">Sale</a>
-          <a href="shop.html">Deals</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
           <a href="index.html#about">About Us</a>
           <a href="journal.html">Journal</a>
-          <a href="contact.html">Careers</a>
-          <a href="contact.html">Press</a>
-          <a href="contact.html">Sustainability</a>
+          <a href="contact.html">Contact</a>
         </div>
         <div class="footer-col">
           <h4>Support</h4>
           <a href="contact.html">Contact Us</a>
-          <a href="contact.html">FAQ</a>
+          <a href="contact.html#faq">FAQ</a>
           <a href="contact.html">Shipping & Returns</a>
           <a href="privacy.html">Privacy Policy</a>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 Deva Decor. All rights reserved.</p>
+        <p class="affiliate-disclosure">As an Amazon Associate, Deva Decor earns from qualifying purchases. Product prices and availability are subject to change.</p>
       </div>
     </div>
   </footer>
@@ -312,11 +272,6 @@
   <script src="js/app.js"></script>
   <script>
     (function () {
-      const COLOR_KEYS = ['Neutral', 'Gold', 'Black', 'White', 'Earth'];
-      function productColorTag(p) {
-        return COLOR_KEYS[p.id % COLOR_KEYS.length];
-      }
-
       document.addEventListener('DOMContentLoaded', async function () {
         const DD = window.DevaDecor;
         if (!DD) return;
@@ -333,16 +288,41 @@
         const activeFiltersEl = document.getElementById('activeFilters');
         const priceRange = document.getElementById('priceRange');
         const priceRangeLabel = document.getElementById('priceRangeLabel');
-        const categoryInputs = document.querySelectorAll('.filter-sidebar input[name="category"]');
-        const colorSwatches = document.querySelectorAll('.filter-swatch');
         const viewBtns = document.querySelectorAll('.view-btn');
 
         let allProducts = DD.products.slice();
         const selectedCategories = new Set();
-        const selectedColors = new Set();
-        let maxPrice = 500;
+        const priceMax = allProducts.length ? Math.ceil(Math.max(...allProducts.map(p => p.price)) / 100) * 100 : 500;
+        let maxPrice = priceMax;
         let visibleCount = 12;
         const PAGE = 12;
+
+        const currSymbol = (allProducts[0] && allProducts[0].currency) || '₹';
+        priceRange.max = priceMax;
+        priceRange.value = priceMax;
+        priceRangeLabel.textContent = currSymbol + priceMax;
+
+        var uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
+
+        var catFilterSection = document.getElementById('categoryFilterSection');
+        uniqueCategories.forEach(function (cat) {
+          var label = document.createElement('label');
+          label.className = 'filter-check';
+          var input = document.createElement('input');
+          input.type = 'checkbox';
+          input.name = 'category';
+          input.value = cat;
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(' ' + cat));
+          catFilterSection.appendChild(label);
+        });
+
+        var categoryInputs = catFilterSection.querySelectorAll('input[name="category"]');
+
+        var catSlugMap = {};
+        uniqueCategories.forEach(function (cat) {
+          catSlugMap[cat.toLowerCase().replace(/\s+/g, '-')] = cat;
+        });
 
         var qParam = new URLSearchParams(window.location.search).get('q');
         if (qParam) {
@@ -357,19 +337,39 @@
           document.title = 'Search: ' + qParam + ' — Deva Decor';
         }
 
+        var catNoticeEl = document.getElementById('shopCatNotice');
         var catParam = new URLSearchParams(window.location.search).get('cat');
         if (catParam) {
-          var catMap = { 'wall-art': 'Wall Art', 'lighting': 'Lighting', 'furniture': 'Furniture', 'vases': 'Vases', 'rugs': 'Rugs', 'mirrors': 'Mirrors', 'textiles': 'Textiles' };
-          var catName = catMap[catParam.toLowerCase()] || catParam;
-          selectedCategories.add(catName);
-          categoryInputs.forEach(function (inp) { if (inp.value === catName) inp.checked = true; });
-          var pageH1 = document.querySelector('.page-header h1');
-          var pageP = document.querySelector('.page-header p');
-          if (pageH1) pageH1.textContent = 'Shop ' + catName;
-          if (pageP) pageP.textContent = 'Browse our curated ' + catName.toLowerCase() + ' collection.';
-          document.title = 'Shop ' + catName + ' — Deva Decor';
-          var metaDesc = document.querySelector('meta[name="description"]');
-          if (metaDesc) metaDesc.setAttribute('content', 'Shop premium ' + catName.toLowerCase() + ' at Deva Decor. Curated picks with honest reviews.');
+          var catName = catSlugMap[catParam.toLowerCase()];
+          if (!catName) {
+            if (catNoticeEl) {
+              catNoticeEl.hidden = false;
+              catNoticeEl.textContent = '';
+              catNoticeEl.appendChild(document.createTextNode('No category matches "'));
+              catNoticeEl.appendChild(document.createTextNode(catParam));
+              catNoticeEl.appendChild(document.createTextNode('". '));
+              var viewAllA = document.createElement('a');
+              viewAllA.href = 'shop.html';
+              viewAllA.textContent = 'View all products';
+              catNoticeEl.appendChild(viewAllA);
+              catNoticeEl.appendChild(document.createTextNode('.'));
+            }
+            var pageH1u = document.querySelector('.page-header h1');
+            var pagePu = document.querySelector('.page-header p');
+            if (pageH1u) pageH1u.textContent = 'Shop';
+            if (pagePu) pagePu.textContent = 'Showing all products — the category in your link is not in our catalog yet.';
+          } else {
+            if (catNoticeEl) { catNoticeEl.hidden = true; catNoticeEl.textContent = ''; }
+            selectedCategories.add(catName);
+            categoryInputs.forEach(function (inp) { if (inp.value === catName) inp.checked = true; });
+            var pageH1 = document.querySelector('.page-header h1');
+            var pageP = document.querySelector('.page-header p');
+            if (pageH1) pageH1.textContent = 'Shop ' + catName;
+            if (pageP) pageP.textContent = 'Browse our curated ' + catName.toLowerCase() + ' collection.';
+            document.title = 'Shop ' + catName + ' — Deva Decor';
+            var metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', 'Shop premium ' + catName.toLowerCase() + ' at Deva Decor. Curated picks with honest reviews.');
+          }
         }
 
         function sortList(list, mode) {
@@ -384,7 +384,6 @@
           return allProducts.filter(function (p) {
             if (p.price > maxPrice) return false;
             if (selectedCategories.size && !selectedCategories.has(p.category)) return false;
-            if (selectedColors.size && !selectedColors.has(productColorTag(p))) return false;
             return true;
           });
         }
@@ -394,11 +393,8 @@
           selectedCategories.forEach(function (c) {
             parts.push({ type: 'cat', label: c, value: c });
           });
-          selectedColors.forEach(function (c) {
-            parts.push({ type: 'color', label: c, value: c });
-          });
-          if (maxPrice < 500) {
-            parts.push({ type: 'price', label: 'Up to $' + maxPrice, value: String(maxPrice) });
+          if (maxPrice < priceMax) {
+            parts.push({ type: 'price', label: 'Up to ' + currSymbol + maxPrice, value: String(maxPrice) });
           }
 
           if (!parts.length) {
@@ -417,16 +413,10 @@
               var t = btn.dataset.filterType;
               var v = btn.dataset.filterValue;
               if (t === 'cat') selectedCategories.delete(v);
-              if (t === 'color') {
-                selectedColors.delete(v);
-                colorSwatches.forEach(function (sw) {
-                  if (sw.dataset.color === v) sw.classList.remove('active');
-                });
-              }
               if (t === 'price') {
-                maxPrice = 500;
-                priceRange.value = '500';
-                priceRangeLabel.textContent = '$500';
+                maxPrice = priceMax;
+                priceRange.value = String(priceMax);
+                priceRangeLabel.textContent = currSymbol + priceMax;
               }
               syncCategoryInputs();
               visibleCount = PAGE;
@@ -464,9 +454,24 @@
             shopProductCount.textContent = '0 products';
             return;
           }
-          productsGrid.innerHTML = slice.map(function (p) {
-            return DD.renderProductCard(p);
-          }).join('');
+
+          var grouped = {};
+          var catOrder = [];
+          slice.forEach(function (p) {
+            var cat = p.category || 'Other';
+            if (!grouped[cat]) { grouped[cat] = []; catOrder.push(cat); }
+            grouped[cat].push(p);
+          });
+
+          var html = '';
+          catOrder.forEach(function (cat) {
+            html += '<div class="category-group">';
+            html += '<h3 class="category-group-title">' + cat + '</h3>';
+            html += '<div class="category-group-grid">';
+            html += grouped[cat].map(function (p) { return DD.renderProductCard(p); }).join('');
+            html += '</div></div>';
+          });
+          productsGrid.innerHTML = html;
 
           var newCards = productsGrid.querySelectorAll('.product-card');
           newCards.forEach(function (c, i) {
@@ -508,25 +513,11 @@
 
         priceRange.addEventListener('input', function () {
           maxPrice = Number(priceRange.value);
-          priceRangeLabel.textContent = '$' + maxPrice;
+          priceRangeLabel.textContent = currSymbol + maxPrice;
           visibleCount = PAGE;
           render(true);
         });
 
-        colorSwatches.forEach(function (sw) {
-          sw.addEventListener('click', function () {
-            var c = sw.dataset.color;
-            if (selectedColors.has(c)) {
-              selectedColors.delete(c);
-              sw.classList.remove('active');
-            } else {
-              selectedColors.add(c);
-              sw.classList.add('active');
-            }
-            visibleCount = PAGE;
-            render(true);
-          });
-        });
 
         function openFilterDrawer() {
           filterSidebar.classList.add('active');

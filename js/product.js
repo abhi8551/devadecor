@@ -11,12 +11,43 @@
   const $ = D.$;
   const $$ = D.$$;
 
+  function escHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function formatDescription(raw) {
+    const blocks = raw.split(/\n\n+/).map(b => b.trim()).filter(Boolean);
+    if (!blocks.length) return '';
+    let html = '';
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+      const isListBlock = lines.length > 1 && lines.every(l => l.length < 120);
+      if (i === 0 && lines.length === 1 && lines[0].length < 120) {
+        html += `<h4 class="desc-heading">${escHtml(lines[0])}</h4>`;
+      } else if (isListBlock) {
+        const headerIdx = lines.findIndex(l => l.endsWith(':'));
+        if (headerIdx >= 0) {
+          html += `<p class="desc-subhead">${escHtml(lines[headerIdx])}</p>`;
+          const items = lines.filter((_, j) => j !== headerIdx);
+          if (items.length) html += '<ul class="desc-list">' + items.map(l => `<li>${escHtml(l)}</li>`).join('') + '</ul>';
+        } else {
+          html += '<ul class="desc-list">' + lines.map(l => `<li>${escHtml(l)}</li>`).join('') + '</ul>';
+        }
+      } else {
+        html += lines.map(l => `<p>${escHtml(l)}</p>`).join('');
+      }
+    }
+    return html;
+  }
+
   // ─── Product Page Data Population ───
   function initProductPage() {
     const detail = $('.product-detail');
     if (!detail) return;
     const products = D.products;
-    const productDescriptions = D.productDescriptions;
     const params = new URLSearchParams(window.location.search);
     const paramId = params.get('id');
     const id = paramId ? parseInt(paramId, 10) : parseInt(detail.dataset.productId, 10);
@@ -27,15 +58,21 @@
     const priceEl = $('.price-current');
     const compareEl = $('.price-compare');
     const saveEl = $('.price-save');
-    const descEl = $('.product-desc');
     const badgeEl = $('.product-badge');
     const mainImg = $('#mainImage');
     const amazonBtn = $('#buyOnAmazon');
     const ratingContainer = $('.product-meta .product-rating');
 
-    const cur = product.currency || '$';
+    const cur = product.currency || '₹';
     if (titleEl) titleEl.textContent = product.name;
-    if (priceEl) priceEl.textContent = cur + product.price;
+    if (priceEl) {
+      if (product.price) {
+        priceEl.textContent = cur + product.price;
+      } else {
+        priceEl.textContent = 'See price on Amazon';
+        priceEl.classList.add('price-check-amazon');
+      }
+    }
     if (compareEl) {
       if (product.comparePrice) {
         compareEl.textContent = cur + product.comparePrice;
@@ -51,20 +88,37 @@
       }
     }
     if (badgeEl) badgeEl.textContent = product.badge || 'Curated Pick';
-    if (descEl) descEl.textContent = productDescriptions[product.id] || '';
 
-    const brandEl = $('.product-badge');
+    const brandEl = $('.product-brand');
     if (brandEl && product.brand) brandEl.textContent = product.brand;
 
-    const detailsAccordion = $('details.product-accordion .accordion-content ul');
-    if (detailsAccordion && product.bullets && product.bullets.length) {
-      detailsAccordion.innerHTML = product.bullets.map(b => `<li>${b}</li>`).join('');
+    const bulletsList = $('#bulletsList');
+    if (bulletsList && product.bullets && product.bullets.length) {
+      bulletsList.innerHTML = product.bullets.map(b => `<li>${escHtml(b)}</li>`).join('');
     }
+
+    const descContent = $('#descriptionContent');
+    const descAccordion = $('#accordionDescription');
+    const rawDesc = product.description || '';
+    if (descContent && rawDesc) {
+      descContent.innerHTML = formatDescription(rawDesc);
+    } else if (descAccordion) {
+      descAccordion.style.display = 'none';
+    }
+
     if (amazonBtn) amazonBtn.href = D.getAmazonLink(product);
-    if (ratingContainer) ratingContainer.innerHTML = D.renderStars(product.rating) + '<span class="rating-count">(' + Math.floor(product.rating * 27) + ' reviews)</span>';
+    const reviewsLink = $('#reviewsAmazonLink');
+    if (reviewsLink) reviewsLink.href = D.getAmazonLink(product);
+    if (ratingContainer) ratingContainer.innerHTML = D.renderStars(product.rating);
 
     const priceNote = $('.price-freshness');
-    if (priceNote) priceNote.textContent = 'Price as of ' + new Date('2026-04-03').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    if (priceNote) {
+      if (product.price) {
+        priceNote.textContent = 'Price as of ' + new Date().toLocaleDateString('en-IN', { month: 'long', day: 'numeric', year: 'numeric' });
+      } else {
+        priceNote.style.display = 'none';
+      }
+    }
 
     const images = product.images && product.images.length ? product.images : [product.image];
     if (mainImg) { mainImg.src = images[0]; mainImg.alt = product.name; }
@@ -85,6 +139,45 @@
     }
 
     document.title = product.name + ' — Deva Decor';
+
+    const canonicalUrl = new URL('product.html', window.location.href);
+    canonicalUrl.search = 'id=' + encodeURIComponent(String(product.id));
+    const canonicalHref = canonicalUrl.href.split('#')[0];
+    const canonicalEl = document.getElementById('canonicalLink');
+    if (canonicalEl) canonicalEl.setAttribute('href', canonicalHref);
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', canonicalHref);
+
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage && product.image) {
+      ogImage.setAttribute('content', window.location.origin + '/' + product.image);
+    }
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', product.name + ' — Deva Decor');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc && product.bullets && product.bullets.length) {
+      ogDesc.setAttribute('content', product.bullets[0]);
+    }
+
+    var schema = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      'name': product.name,
+      'image': window.location.origin + '/' + (product.image || ''),
+      'description': product.description || product.name,
+      'brand': { '@type': 'Brand', 'name': product.brand || 'Deva Decor' }
+    };
+    if (product.price) {
+      schema.offers = {
+        '@type': 'Offer',
+        'url': window.location.href,
+        'priceCurrency': 'INR',
+        'price': String(product.price),
+        'availability': 'https://schema.org/InStock'
+      };
+    }
+    var schemaEl = document.getElementById('productSchema');
+    if (schemaEl) schemaEl.textContent = JSON.stringify(schema);
   }
 
   // ─── Product Gallery ───
@@ -144,61 +237,6 @@
     });
   }
 
-  // ─── Comparison Table ───
-  function initComparisonTable() {
-    const table = $('#comparisonTable');
-    if (!table) return;
-    const products = D.products;
-    const params = new URLSearchParams(window.location.search);
-    const paramId = params.get('id');
-    const id = paramId ? parseInt(paramId, 10) : 1;
-    const current = products.find(p => p.id === id) || products[0];
-    if (!current) return;
-    const similar = products.filter(p => p.id !== current.id && p.category === current.category).slice(0, 2);
-    if (similar.length < 2) {
-      const alt = products.filter(p => p.id !== current.id && !similar.includes(p)).slice(0, 2 - similar.length);
-      similar.push(...alt);
-    }
-    const items = [current, ...similar];
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Feature</th>
-          ${items.map((p, i) => `<th${i === 0 ? ' class="highlight"' : ''}>${p.name}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Image</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}><img class="product-thumb" src="${p.image}" alt="${p.name}"></td>`).join('')}
-        </tr>
-        <tr>
-          <td>Price</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}>${p.currency || '$'}${p.price}${p.comparePrice ? ` <span style="text-decoration:line-through;opacity:.5">${p.currency || '$'}${p.comparePrice}</span>` : ''}</td>`).join('')}
-        </tr>
-        <tr>
-          <td>Rating</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}>${D.renderStars(p.rating)}</td>`).join('')}
-        </tr>
-        <tr>
-          <td>Category</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}>${p.category}</td>`).join('')}
-        </tr>
-        <tr>
-          <td>On Sale</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}>${p.comparePrice ? '<span class="check">✓ Yes</span>' : '<span class="cross">—</span>'}</td>`).join('')}
-        </tr>
-        <tr>
-          <td>Prime Eligible</td>
-          ${items.map((p, i) => `<td${i === 0 ? ' class="highlight"' : ''}><span class="check">✓ Yes</span></td>`).join('')}
-        </tr>
-        <tr>
-          <td></td>
-          ${items.map((p, i) => `<td class="cta-cell${i === 0 ? ' highlight' : ''}"><a href="${D.getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Shop Now</a></td>`).join('')}
-        </tr>
-      </tbody>`;
-  }
-
   // ─── Sticky ATC Bar ───
   function initStickyATC() {
     const mainBtn = $('#buyOnAmazon');
@@ -207,7 +245,7 @@
     bar.className = 'sticky-atc';
     const titleEl = $('.product-title');
     const priceEl = $('.price-current');
-    bar.innerHTML = `<span class="sticky-atc-name">${titleEl ? titleEl.textContent : ''}</span><span class="sticky-atc-price">${priceEl ? priceEl.textContent : ''}</span><a href="${mainBtn.href}" target="_blank" rel="nofollow" class="btn btn-primary">Shop Now</a>`;
+    bar.innerHTML = `<span class="sticky-atc-name">${titleEl ? titleEl.textContent : ''}</span><span class="sticky-atc-price">${priceEl ? priceEl.textContent : ''}</span><a href="${mainBtn.href}" target="_blank" rel="nofollow" class="btn btn-primary">Check Price on Amazon</a>`;
     document.body.appendChild(bar);
     const observer = new IntersectionObserver(entries => {
       bar.classList.toggle('visible', !entries[0].isIntersecting);
@@ -285,20 +323,6 @@
     });
   }
 
-  // ─── Live Viewers on PDP ───
-  function initLiveViewers() {
-    const container = $('#liveViewers');
-    if (!container) return;
-    const base = Math.floor(Math.random() * 15) + 8;
-    container.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> <span class="viewer-count">${base}</span> people are viewing this right now`;
-    const countEl = container.querySelector('.viewer-count');
-    setInterval(() => {
-      const change = Math.random() > 0.5 ? 1 : -1;
-      const current = parseInt(countEl.textContent, 10);
-      countEl.textContent = Math.max(5, Math.min(40, current + change));
-    }, 4000 + Math.random() * 3000);
-  }
-
   // ─── Initialize Product Page Features ───
   function initProductFeatures() {
     if (!$('.product-detail')) return;
@@ -307,14 +331,11 @@
       return;
     }
     initProductPage();
-    initProductGallery();
     initGallerySwipe();
     initHoverZoom();
-    initComparisonTable();
     initStickyATC();
     initImageMagnifier();
     initColorSwatches();
-    initLiveViewers();
   }
 
   if (document.readyState === 'loading') {

@@ -378,6 +378,48 @@
   margin-bottom: 6px;
 }
 
+.accordion-content .desc-heading {
+  font-family: var(--font-display, 'Playfair Display', serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 12px;
+}
+
+.accordion-content .desc-subhead {
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 16px 0 8px;
+}
+
+.accordion-content .desc-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.accordion-content .desc-list li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+}
+
+.accordion-content .desc-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary, #b8976a);
+  font-size: 0.7em;
+  top: 3px;
+}
+
+.accordion-content p {
+  margin: 0 0 10px;
+}
+
+.accordion-content p:last-child {
+  margin-bottom: 0;
+}
+
 /* --- Reviews --- */
 .reviews-summary {
   display: flex;

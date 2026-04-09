@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#b8976a">
-  <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
+  <!-- Google Analytics — uncomment and replace G-XXXXXXXXXX with your Measurement ID
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.svg">
   <link rel="canonical" href="https://devadecor.com/">
@@ -25,7 +26,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://formspree.io https://www.google-analytics.com; frame-src 'none';">
   <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&h=1080&fit=crop" fetchpriority="high">
   <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -52,15 +54,8 @@
           <a href="shop.html" class="nav-link">Shop</a>
           <div class="dropdown-menu mega-dropdown">
             <div class="dropdown-grid">
-              <div class="dropdown-col">
+              <div class="dropdown-col" id="navCategoryLinks">
                 <h4>Categories</h4>
-                <a href="shop.html?cat=wall-art">Wall Art</a>
-                <a href="shop.html?cat=lighting">Lighting</a>
-                <a href="shop.html?cat=furniture">Furniture</a>
-                <a href="shop.html?cat=vases">Vases</a>
-                <a href="shop.html?cat=rugs">Rugs</a>
-                <a href="shop.html?cat=mirrors">Mirrors</a>
-                <a href="shop.html?cat=textiles">Textiles</a>
               </div>
               <div class="dropdown-col">
                 <h4>Inspiration</h4>
@@ -133,7 +128,7 @@
         <h1 class="hero-title">Elevate Your Space<br>with Timeless Decor</h1>
         <p class="hero-subtitle">Handcrafted pieces that transform houses into homes. Curated with intention, designed to inspire.</p>
         <div class="hero-actions">
-          <a href="#featured" class="btn btn-primary btn-lg">Shop Now</a>
+          <a href="shop.html" class="btn btn-primary btn-lg">Shop Now</a>
           <a href="room-living.html" class="btn btn-outline-light btn-lg">Explore Rooms</a>
         </div>
       </div>
@@ -146,21 +141,21 @@
     <!-- Marquee -->
     <div class="marquee-bar">
       <div class="marquee-track">
-        <span>Curated Home Decor Picks</span>
+        <span>Curated Home Decor</span>
         <span class="marquee-dot">◆</span>
-        <span>Handcrafted with Love</span>
+        <span>Amazon India Fulfilled</span>
         <span class="marquee-dot">◆</span>
-        <span>Free Shipping on All Orders</span>
+        <span>Quality Guaranteed</span>
         <span class="marquee-dot">◆</span>
-        <span>Sustainable Materials</span>
+        <span>Easy Returns</span>
         <span class="marquee-dot">◆</span>
-        <span>Curated Home Decor Picks</span>
+        <span>Curated Home Decor</span>
         <span class="marquee-dot">◆</span>
-        <span>Handcrafted with Love</span>
+        <span>Amazon India Fulfilled</span>
         <span class="marquee-dot">◆</span>
-        <span>Free Shipping on All Orders</span>
+        <span>Quality Guaranteed</span>
         <span class="marquee-dot">◆</span>
-        <span>Sustainable Materials</span>
+        <span>Easy Returns</span>
         <span class="marquee-dot">◆</span>
       </div>
     </div>
@@ -220,61 +215,7 @@
           <h2 class="section-title">Shop by Category</h2>
         </div>
 
-        <div class="categories-grid" data-animate="stagger">
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=600&h=700&fit=crop" alt="Wall Art" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Wall Art</h3>
-              <span class="category-count">48 pieces</span>
-            </div>
-          </a>
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600&h=700&fit=crop" alt="Lighting" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Lighting</h3>
-              <span class="category-count">36 pieces</span>
-            </div>
-          </a>
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=700&fit=crop" alt="Furniture" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Furniture</h3>
-              <span class="category-count">64 pieces</span>
-            </div>
-          </a>
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=600&h=700&fit=crop" alt="Vases" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Vases</h3>
-              <span class="category-count">29 pieces</span>
-            </div>
-          </a>
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1600166898405-da9535204843?w=600&h=700&fit=crop" alt="Rugs" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Rugs</h3>
-              <span class="category-count">42 pieces</span>
-            </div>
-          </a>
-          <a href="shop.html" class="category-card" data-animate="clip-reveal">
-            <div class="category-img">
-              <img src="https://images.unsplash.com/photo-1618220179428-22790b461013?w=600&h=700&fit=crop" alt="Mirrors" loading="lazy" width="600" height="700">
-            </div>
-            <div class="category-info">
-              <h3>Mirrors</h3>
-              <span class="category-count">22 pieces</span>
-            </div>
-          </a>
+        <div class="categories-grid" data-animate="stagger" id="categoriesGrid">
         </div>
       </div>
     </section>
@@ -295,7 +236,6 @@
           <a href="shop.html" class="collection-card collection-card-lg">
             <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop" alt="Modern Minimalism" loading="lazy">
             <div class="collection-overlay">
-              <span class="collection-tag">12 Products</span>
               <h3>Modern Minimalism</h3>
               <span class="collection-link">View Collection →</span>
             </div>
@@ -303,7 +243,6 @@
           <a href="shop.html" class="collection-card">
             <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=600&h=400&fit=crop" alt="Warm & Cozy" loading="lazy">
             <div class="collection-overlay">
-              <span class="collection-tag">18 Products</span>
               <h3>Warm & Cozy</h3>
               <span class="collection-link">View Collection →</span>
             </div>
@@ -311,7 +250,6 @@
           <a href="shop.html" class="collection-card">
             <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop" alt="Scandi Living" loading="lazy">
             <div class="collection-overlay">
-              <span class="collection-tag">15 Products</span>
               <h3>Scandi Living</h3>
               <span class="collection-link">View Collection →</span>
             </div>
@@ -319,7 +257,6 @@
           <a href="shop.html" class="collection-card collection-card-lg">
             <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop" alt="Luxury Living" loading="lazy">
             <div class="collection-overlay">
-              <span class="collection-tag">22 Products</span>
               <h3>Luxury Living</h3>
               <span class="collection-link">View Collection →</span>
             </div>
@@ -343,20 +280,24 @@
           <div class="about-content">
             <span class="section-tag">Our Story</span>
             <h2 class="section-title">Crafted with Passion,<br>Designed for Living</h2>
-            <p>At Deva Decor, we believe every space tells a story. Founded in 2018, we've been on a mission to bring artisan-crafted, sustainable home decor to discerning homeowners who value quality, beauty, and intention.</p>
-            <p>Each piece in our collection is thoughtfully sourced from skilled artisans around the world, blending traditional craftsmanship with contemporary design to create timeless pieces that elevate everyday living.</p>
+            <p>At Deva Decor, we curate premium home decor that combines style with everyday functionality. Every product in our collection is handpicked for quality, design, and value — available exclusively through Amazon India.</p>
+            <p>From elegant wall hooks to sturdy furniture legs, we focus on the details that transform a house into a home. All orders are fulfilled by Amazon with fast delivery and easy returns.</p>
             <div class="about-stats" data-animate="counter">
               <div class="stat">
-                <span class="stat-num">5000+</span>
-                <span class="stat-label">Happy Homes</span>
+                <span class="stat-num" id="statProductCount">0</span>
+                <span class="stat-label">Curated Collection</span>
               </div>
               <div class="stat">
-                <span class="stat-num">200+</span>
-                <span class="stat-label">Unique Pieces</span>
+                <span class="stat-num stat-num--static">100%</span>
+                <span class="stat-label">Quality Assured</span>
               </div>
               <div class="stat">
-                <span class="stat-num">50+</span>
-                <span class="stat-label">Artisan Partners</span>
+                <span class="stat-num stat-num--static">24/7</span>
+                <span class="stat-label">Customer Support</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num stat-num--static">4.5+</span>
+                <span class="stat-label">Average Rating</span>
               </div>
             </div>
             <a href="contact.html" class="btn btn-primary">Learn More</a>
@@ -402,7 +343,7 @@
       <div class="parallax-bg" style="background-image: url('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1920&h=800&fit=crop')"></div>
       <div class="parallax-content" data-animate="blur-in">
         <h2>Transform Every Room<br>Into a Sanctuary</h2>
-        <a href="#featured" class="btn btn-primary btn-lg">Discover More</a>
+        <a href="shop.html" class="btn btn-primary btn-lg">Discover More</a>
       </div>
     </section>
 
@@ -414,126 +355,24 @@
           <span class="section-tag">Reviews</span>
           <h2 class="section-title">What Our Customers Say</h2>
         </div>
-        <div class="testimonials-carousel" data-animate="fade-up">
+        <div class="testimonials-carousel testimonials-carousel--simple" data-animate="fade-up">
           <div class="testimonial-track" id="testimonialTrack">
-            <div class="testimonial-card">
-              <div class="testimonial-card-inner">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Absolutely stunning quality. The ceramic vase I ordered exceeded my expectations — it's become the centerpiece of my living room."</p>
-                <div class="testimonial-author">
-                  <div class="testimonial-avatar">SC</div>
-                  <div>
-                    <strong>Sarah Chen</strong>
-                    <span>Verified Buyer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="testimonial-card">
-              <div class="testimonial-card-inner">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"Deva Decor transformed my apartment. The attention to detail in every piece shows real craftsmanship. Will definitely be ordering again."</p>
-                <div class="testimonial-author">
-                  <div class="testimonial-avatar">MR</div>
-                  <div>
-                    <strong>Marcus Rivera</strong>
-                    <span>Verified Buyer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="testimonial-card">
-              <div class="testimonial-card-inner">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"The mirror I purchased is perfect — elegant and beautifully made. Shipping was fast and the packaging was impeccable. Highly recommend!"</p>
-                <div class="testimonial-author">
-                  <div class="testimonial-avatar">EJ</div>
-                  <div>
-                    <strong>Emma Johnson</strong>
-                    <span>Verified Buyer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="testimonial-card">
-              <div class="testimonial-card-inner">
-                <div class="testimonial-stars">★★★★★</div>
-                <p class="testimonial-text">"I've bought from many home decor stores but Deva stands apart. The quality is unmatched and every piece feels special and unique."</p>
-                <div class="testimonial-author">
-                  <div class="testimonial-avatar">AP</div>
-                  <div>
-                    <strong>Aisha Patel</strong>
-                    <span>Verified Buyer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <p class="testimonials-trust-message">Trusted by home decor enthusiasts across India</p>
           </div>
-          <div class="testimonial-dots" id="testimonialDots"></div>
+          <div class="testimonial-dots" id="testimonialDots" hidden aria-hidden="true"></div>
         </div>
       </div>
     </section>
 
-    <div class="section-divider section-divider--alt"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,0 C480,60 960,60 1440,0 L1440,60 L0,60 Z" fill="var(--color-bg-alt)"/></svg></div>
-
-    <!-- Instagram / Gallery Feed -->
-    <section class="section section-alt" id="gallery">
-      <div class="container">
-        <div class="section-header" data-animate="fade-up">
-          <span class="section-accent-line"></span>
-          <span class="section-tag">@devadecor</span>
-          <h2 class="section-title">Get Inspired</h2>
-          <p class="section-desc">Follow us on Instagram for daily inspiration and styling tips.</p>
-        </div>
-        <div class="gallery-grid" data-animate="stagger">
-          <a href="#" class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-          <a href="#" class="gallery-item gallery-item-tall">
-            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=600&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-          <a href="#" class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-          <a href="#" class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-          <a href="#" class="gallery-item gallery-item-wide">
-            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=600&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-          <a href="#" class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1616137466211-f02fc81ae5d1?w=400&h=400&fit=crop" alt="Interior inspiration" loading="lazy">
-            <div class="gallery-overlay">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Newsletter -->
-    <section class="newsletter-section" id="contact">
+    <!-- Newsletter (hidden until Formspree is configured — remove style="display:none" to re-enable) -->
+    <section class="newsletter-section" id="contact" style="display:none">
       <div class="container">
         <div class="newsletter-content" data-animate="scale-in">
           <span class="section-tag">Stay Connected</span>
           <h2 class="section-title">Join the Deva Family</h2>
           <p>Subscribe for curated decor picks, styling tips, and exclusive Amazon deals delivered to your inbox.</p>
-          <form class="newsletter-form" id="newsletterForm">
+          <!-- Replace YOUR_NEWSLETTER_FORM_ID with your Formspree form id (dashboard → Integration → form endpoint). -->
+          <form class="newsletter-form" id="newsletterForm" method="post" action="https://formspree.io/f/YOUR_NEWSLETTER_FORM_ID">
             <div class="newsletter-input-wrap">
               <input type="email" placeholder="Your email address" required>
               <button type="submit" class="btn btn-primary">Subscribe</button>
@@ -555,47 +394,28 @@
             <span class="logo-sub">DECOR</span>
           </a>
           <p>Transforming houses into homes with timeless, artisan-crafted decor since 2018.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </a>
-            <a href="#" aria-label="Pinterest">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.94-.2-2.4.04-3.44l1.4-5.96s-.36-.72-.36-1.78c0-1.66.97-2.9 2.17-2.9 1.02 0 1.52.77 1.52 1.7 0 1.03-.66 2.57-.99 4-.28 1.2.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.21 0 1.03.4 2.14.89 2.74a.36.36 0 0 1 .08.35l-.33 1.36c-.05.22-.18.27-.4.16-1.49-.7-2.42-2.88-2.42-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.6 7.46-6.22 7.46-1.22 0-2.36-.63-2.75-1.38l-.75 2.86c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0z"/></svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-            </a>
-          </div>
         </div>
         <div class="footer-col">
           <h4>Shop</h4>
           <a href="shop.html">All Products</a>
-          <a href="shop.html">New Arrivals</a>
-          <a href="shop.html">Best Sellers</a>
-          <a href="shop.html">Sale</a>
-          <a href="shop.html">Deals</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
           <a href="index.html#about">About Us</a>
           <a href="journal.html">Journal</a>
-          <a href="contact.html">Careers</a>
-          <a href="contact.html">Press</a>
-          <a href="contact.html">Sustainability</a>
+          <a href="contact.html">Contact</a>
         </div>
         <div class="footer-col">
           <h4>Support</h4>
           <a href="contact.html">Contact Us</a>
-          <a href="contact.html">FAQ</a>
+          <a href="contact.html#faq">FAQ</a>
           <a href="contact.html">Shipping &amp; Returns</a>
           <a href="privacy.html">Privacy Policy</a>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 Deva Decor. All rights reserved.</p>
+        <p class="affiliate-disclosure">As an Amazon Associate, Deva Decor earns from qualifying purchases. Product prices and availability are subject to change.</p>
       </div>
     </div>
   </footer>
@@ -606,21 +426,40 @@
     "@type": "Organization",
     "name": "Deva Decor",
     "url": "https://devadecor.com",
-    "logo": "https://devadecor.com/logo.png",
+    "logo": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E",
     "description": "Elevate your space with timeless, handcrafted home decor.",
-    "sameAs": [
-      "https://www.instagram.com/devadecor",
-      "https://www.pinterest.com/devadecor",
-      "https://www.facebook.com/devadecor"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+1-555-123-4567",
-      "contactType": "Customer Service",
-      "availableLanguage": "English"
-    }
+    "sameAs": []
   }
   </script>
   <script src="js/app.js"></script>
+  <script>
+    (function() {
+      if (!window.DevaDecor) return;
+      window.DevaDecor.dataReady.then(function() {
+        var grid = document.getElementById('categoriesGrid');
+        if (!grid) return;
+        var cats = {};
+        window.DevaDecor.products.forEach(function(p) {
+          if (p.category && !cats[p.category]) {
+            cats[p.category] = p.image || '';
+          }
+        });
+        var catNames = Object.keys(cats);
+        if (catNames.length === 0) {
+          grid.closest('.section').style.display = 'none';
+          return;
+        }
+        grid.innerHTML = catNames.map(function(name) {
+          var slug = name.toLowerCase().replace(/\s+/g, '-');
+          var img = cats[name];
+          return '<a href="shop.html?cat=' + slug + '" class="category-card" data-animate="clip-reveal">' +
+            '<div class="category-img">' +
+            '<img src="' + img + '" alt="' + name + '" loading="lazy" width="600" height="700">' +
+            '</div>' +
+            '<div class="category-info"><h3>' + name + '</h3></div></a>';
+        }).join('');
+      });
+    })();
+  </script>
 </body>
 </html>

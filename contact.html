@@ -4,16 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#b8976a">
-  <!-- Google Analytics — replace G-XXXXXXXXXX with your Measurement ID -->
+  <!-- Google Analytics — uncomment and replace G-XXXXXXXXXX with your Measurement ID
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23b8976a'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='20' font-weight='600' fill='white'%3ED%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" href="img/apple-touch-icon.svg">
   <link rel="canonical" href="https://devadecor.com/contact.html">
-  <meta name="description" content="Contact Deva Decor — visit our showroom, call, or send a message. We're here to help with orders, wholesale, and more.">
+  <meta name="description" content="Contact Deva Decor — reach us via email or WhatsApp. We're here to help with product inquiries, wholesale orders, and more.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Contact — Deva Decor">
-  <meta property="og:description" content="Contact Deva Decor — visit our showroom, call, or send a message. We're here to help with orders, wholesale, and more.">
+  <meta property="og:description" content="Contact Deva Decor — reach us via email or WhatsApp. We're here to help with product inquiries, wholesale orders, and more.">
   <meta property="og:image" content="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&h=630&fit=crop">
   <meta property="og:url" content="https://devadecor.com/contact.html">
   <meta name="twitter:card" content="summary_large_image">
@@ -25,7 +26,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://formspree.io https://www.google-analytics.com; frame-src 'none';">
   <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="manifest" href="manifest.json">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/pages/contact.css">
 </head>
@@ -52,15 +54,8 @@
           <a href="shop.html" class="nav-link">Shop</a>
           <div class="dropdown-menu mega-dropdown">
             <div class="dropdown-grid">
-              <div class="dropdown-col">
+              <div class="dropdown-col" id="navCategoryLinks">
                 <h4>Categories</h4>
-                <a href="shop.html?cat=wall-art">Wall Art</a>
-                <a href="shop.html?cat=lighting">Lighting</a>
-                <a href="shop.html?cat=furniture">Furniture</a>
-                <a href="shop.html?cat=vases">Vases</a>
-                <a href="shop.html?cat=rugs">Rugs</a>
-                <a href="shop.html?cat=mirrors">Mirrors</a>
-                <a href="shop.html?cat=textiles">Textiles</a>
               </div>
               <div class="dropdown-col">
                 <h4>Inspiration</h4>
@@ -122,7 +117,8 @@
 
     <div class="container">
       <div class="contact-grid">
-        <form class="contact-form" id="contactForm">
+        <!-- Replace YOUR_CONTACT_FORM_ID with your Formspree form id (can be a separate form from the newsletter). -->
+        <form class="contact-form" id="contactForm" method="post" action="https://formspree.io/f/YOUR_CONTACT_FORM_ID">
           <div class="form-group form-group--float">
             <input class="form-input" type="text" id="contactName" name="name" required autocomplete="name" placeholder=" ">
             <label class="form-label" for="contactName">Name</label>
@@ -150,76 +146,65 @@
         </form>
 
         <div class="contact-info">
-          <h3>Visit Us</h3>
+          <h3>Reach Out</h3>
           <div class="contact-detail">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <div>
-              <h4>Address</h4>
-              <p>123 Design District, New York, NY 10001</p>
-            </div>
-          </div>
-          <div class="contact-detail">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <div>
-              <h4>Phone</h4>
-              <p><a href="tel:+12125550190">+1 (212) 555-0190</a></p>
-            </div>
-          </div>
-          <div class="contact-detail">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             <div>
               <h4>Email</h4>
               <p><a href="mailto:hello@devadecor.com">hello@devadecor.com</a></p>
             </div>
           </div>
           <div class="contact-detail">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
             <div>
-              <h4>Hours</h4>
-              <p>Mon–Sat 10am–7pm, Sun 12pm–5pm</p>
+              <h4>WhatsApp</h4>
+              <p>Ask us for our WhatsApp number by email — we will reply with the verified business line.</p>
             </div>
           </div>
-          <div class="contact-map" role="img" aria-label="Map placeholder">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.4;margin-bottom:8px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            123 Design District, New York
+          <div class="contact-detail">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div>
+              <h4>Response Time</h4>
+              <p>We typically respond within 24 hours</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="faq-section">
+    <div class="faq-section" id="faq">
       <div class="container">
         <div class="section-header" data-animate="fade-up">
           <h2 class="section-title">Frequently Asked Questions</h2>
         </div>
         <details class="product-accordion">
-          <summary>What is your return policy?</summary>
+          <summary>How do I place an order?</summary>
           <div class="accordion-content">
-            <p>We offer 30-day returns on unused items in original packaging. Contact us to start a return.</p>
+            <p>All our products are sold exclusively through Amazon India. Click "Check Price on Amazon" on any product to view pricing and place your order directly on Amazon.</p>
           </div>
         </details>
         <details class="product-accordion">
-          <summary>How long does shipping take?</summary>
+          <summary>What is the return policy?</summary>
           <div class="accordion-content">
-            <p>Standard shipping typically takes 5–7 business days. Express shipping arrives in 2–3 business days.</p>
+            <p>Returns are handled by Amazon India as per their standard return policy. Most items can be returned within 7–10 days of delivery. Check the product page on Amazon for specific return eligibility.</p>
           </div>
         </details>
         <details class="product-accordion">
-          <summary>Do you ship internationally?</summary>
+          <summary>How long does delivery take?</summary>
           <div class="accordion-content">
-            <p>Yes — we ship to 40+ countries. International rates are shown at checkout.</p>
+            <p>Delivery is fulfilled by Amazon India. Standard delivery typically takes 3–7 business days depending on your location. Prime-eligible items may arrive faster.</p>
           </div>
         </details>
         <details class="product-accordion">
           <summary>How do I track my order?</summary>
           <div class="accordion-content">
-            <p>You'll receive an email confirmation with a tracking link as soon as your order ships.</p>
+            <p>Once you place an order on Amazon, you can track it through your Amazon account under "Your Orders".</p>
           </div>
         </details>
         <details class="product-accordion">
-          <summary>Do you offer wholesale pricing?</summary>
+          <summary>Do you offer wholesale or bulk orders?</summary>
           <div class="accordion-content">
-            <p>Yes. Email <a href="mailto:wholesale@devadecor.com">wholesale@devadecor.com</a> with your business details.</p>
+            <p>Yes, we offer bulk pricing for businesses and interior designers. Email us at <a href="mailto:hello@devadecor.com">hello@devadecor.com</a> with your requirements.</p>
           </div>
         </details>
       </div>
@@ -236,47 +221,28 @@
             <span class="logo-sub">DECOR</span>
           </a>
           <p>Transforming houses into homes with timeless, artisan-crafted decor since 2018.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Instagram">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            </a>
-            <a href="#" aria-label="Pinterest">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.94-.2-2.4.04-3.44l1.4-5.96s-.36-.72-.36-1.78c0-1.66.97-2.9 2.17-2.9 1.02 0 1.52.77 1.52 1.7 0 1.03-.66 2.57-.99 4-.28 1.2.6 2.17 1.78 2.17 2.13 0 3.77-2.25 3.77-5.5 0-2.87-2.06-4.88-5.01-4.88-3.41 0-5.42 2.56-5.42 5.21 0 1.03.4 2.14.89 2.74a.36.36 0 0 1 .08.35l-.33 1.36c-.05.22-.18.27-.4.16-1.49-.7-2.42-2.88-2.42-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.4 2.97 7.4 6.93 0 4.14-2.6 7.46-6.22 7.46-1.22 0-2.36-.63-2.75-1.38l-.75 2.86c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0z"/></svg>
-            </a>
-            <a href="#" aria-label="Facebook">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-            <a href="#" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-            </a>
-          </div>
         </div>
         <div class="footer-col">
           <h4>Shop</h4>
           <a href="shop.html">All Products</a>
-          <a href="shop.html">New Arrivals</a>
-          <a href="shop.html">Best Sellers</a>
-          <a href="shop.html">Sale</a>
-          <a href="shop.html">Deals</a>
         </div>
         <div class="footer-col">
           <h4>Company</h4>
           <a href="index.html#about">About Us</a>
           <a href="journal.html">Journal</a>
-          <a href="contact.html">Careers</a>
-          <a href="contact.html">Press</a>
-          <a href="contact.html">Sustainability</a>
+          <a href="contact.html">Contact</a>
         </div>
         <div class="footer-col">
           <h4>Support</h4>
           <a href="contact.html">Contact Us</a>
-          <a href="contact.html">FAQ</a>
+          <a href="contact.html#faq">FAQ</a>
           <a href="contact.html">Shipping & Returns</a>
           <a href="privacy.html">Privacy Policy</a>
         </div>
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 Deva Decor. All rights reserved.</p>
+        <p class="affiliate-disclosure">As an Amazon Associate, Deva Decor earns from qualifying purchases. Product prices and availability are subject to change.</p>
       </div>
     </div>
   </footer>
@@ -289,13 +255,18 @@
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (!form.checkValidity()) { form.reportValidity(); return; }
+        var action = (form.getAttribute('action') || '').trim();
+        if (!action || action === '#' || !/^https?:\/\//i.test(action) || /YOUR_CONTACT_FORM_ID/i.test(action)) {
+          DevaDecor.showToast('Contact', 'Add your Formspree form id in contact.html (search YOUR_CONTACT_FORM_ID), or email hello@devadecor.com.');
+          return;
+        }
         var btn = form.querySelector('button[type="submit"]');
         btn.disabled = true;
         btn.textContent = 'Sending…';
         try {
           var data = {};
           new FormData(form).forEach(function (v, k) { data[k] = v; });
-          var res = await fetch(form.action || 'https://formspree.io/f/YOUR_FORM_ID', {
+          var res = await fetch(action, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify(data)
@@ -307,8 +278,7 @@
             DevaDecor.showToast('Error', 'Something went wrong. Please try again.');
           }
         } catch (err) {
-          DevaDecor.showToast('Message sent!', 'We\'ll get back to you within 24 hours');
-          form.reset();
+          DevaDecor.showToast('Error', 'Could not send your message. Please try again later or email us directly.');
         }
         btn.disabled = false;
         btn.textContent = 'Send Message';
@@ -322,28 +292,28 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "What is your return policy?",
-        "acceptedAnswer": { "@type": "Answer", "text": "We offer 30-day returns on unused items in original packaging. Contact us to start a return." }
+        "name": "How do I place an order?",
+        "acceptedAnswer": { "@type": "Answer", "text": "All our products are sold exclusively through Amazon India. Click 'Check Price on Amazon' on any product to view pricing and place your order directly on Amazon." }
       },
       {
         "@type": "Question",
-        "name": "How long does shipping take?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Standard shipping typically takes 5–7 business days. Express shipping arrives in 2–3 business days." }
+        "name": "What is the return policy?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Returns are handled by Amazon India as per their standard return policy. Most items can be returned within 7–10 days of delivery. Check the product page on Amazon for specific return eligibility." }
       },
       {
         "@type": "Question",
-        "name": "Do you ship internationally?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes — we ship to 40+ countries. International rates are shown at checkout." }
+        "name": "How long does delivery take?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Delivery is fulfilled by Amazon India. Standard delivery typically takes 3–7 business days depending on your location. Prime-eligible items may arrive faster." }
       },
       {
         "@type": "Question",
         "name": "How do I track my order?",
-        "acceptedAnswer": { "@type": "Answer", "text": "You'll receive an email confirmation with a tracking link as soon as your order ships." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Once you place an order on Amazon, you can track it through your Amazon account under 'Your Orders'." }
       },
       {
         "@type": "Question",
-        "name": "Do you offer wholesale pricing?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Yes. Email wholesale@devadecor.com with your business details." }
+        "name": "Do you offer wholesale or bulk orders?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes, we offer bulk pricing for businesses and interior designers. Email us at hello@devadecor.com with your requirements." }
       }
     ]
   }

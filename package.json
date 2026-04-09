@@ -1,0 +1,12 @@
+{
+  "name": "devadecorwebsite",
+  "private": true,
+  "scripts": {
+    "minify": "terser js/app.js -c -m -o js/app.min.js && terser js/product.js -c -m -o js/product.min.js && csso css/styles.css -o css/styles.min.css",
+    "build": "npm run minify"
+  },
+  "devDependencies": {
+    "csso-cli": "^4.0.2",
+    "terser": "^5.37.0"
+  }
+}

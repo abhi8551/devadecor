@@ -5,11 +5,9 @@
 (function () {
   'use strict';
 
-  const AFFILIATE_TAG = 'devadecor-20';
-  const PRICES_UPDATED = '2026-04-03';
+  const AFFILIATE_TAG = 'devadecor0b-21';
 
   let products = [];
-  let productDescriptions = {};
   let favoriteProducts = [];
   let _resolveReady;
   const dataReady = new Promise(r => { _resolveReady = r; });
@@ -59,7 +57,6 @@
 
   window.DevaDecor = {
     get products() { return products; },
-    get productDescriptions() { return productDescriptions; },
     get favoriteProducts() { return favoriteProducts; },
     dataReady,
     renderProductCard, attachCardEvents, showToast, getAmazonLink, renderStars,
@@ -84,6 +81,35 @@
     if (hamburger && menu) {
       hamburger.addEventListener('click', () => { hamburger.classList.toggle('active'); menu.classList.toggle('active'); });
       $$('.nav-link', menu).forEach(link => link.addEventListener('click', () => { hamburger.classList.remove('active'); menu.classList.remove('active'); }));
+    }
+    const shopDropdown = document.querySelector('.nav-item.has-dropdown');
+    if (shopDropdown) {
+      const trigger = shopDropdown.querySelector(':scope > .nav-link');
+      const panel = shopDropdown.querySelector('.dropdown-menu');
+      if (trigger && panel) {
+        trigger.setAttribute('aria-haspopup', 'true');
+        trigger.setAttribute('aria-expanded', 'false');
+        function setExpanded(open) {
+          trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        shopDropdown.addEventListener('mouseenter', () => setExpanded(true));
+        shopDropdown.addEventListener('mouseleave', () => setExpanded(false));
+        trigger.addEventListener('focus', () => setExpanded(true));
+        trigger.addEventListener('blur', e => {
+          if (!shopDropdown.contains(e.relatedTarget)) setExpanded(false);
+        });
+        trigger.addEventListener('keydown', e => {
+          if (e.key === 'Escape') {
+            setExpanded(false);
+            trigger.blur();
+          }
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const first = panel.querySelector('a');
+            if (first) first.focus();
+          }
+        });
+      }
     }
     let lastScroll = 0;
     if (navbar) {
@@ -128,7 +154,7 @@
         const q = input.value.toLowerCase().trim();
         if (q.length < 2) { suggestions.innerHTML = ''; return; }
         const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 5);
-        suggestions.innerHTML = matches.length ? matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '$'}${p.price}</span></div></a>`).join('') : '<div class="search-no-results">No products found</div>';
+        suggestions.innerHTML = matches.length ? matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('') : '<div class="search-no-results">No products found</div>';
       });
     }
   }
@@ -162,15 +188,15 @@
         <a href="${product.link}">
           <img src="${product.image}" alt="${product.name}" loading="lazy" width="600" height="800" class="${product.image.startsWith('images/') ? 'local-img' : ''}">
         </a>
-        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn">Shop Now</a>
+        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn">Check Price on Amazon</a>
       </div>
       <div class="product-card-info">
         <div class="product-card-category">${product.category}</div>
         ${renderStars(product.rating)}
         <h3 class="product-card-name"><a href="${product.link}">${product.name}</a></h3>
         <div class="product-card-price">
-          <span class="current">${product.currency || '$'}${product.price}</span>
-          ${product.comparePrice ? `<span class="compare">${product.currency || '$'}${product.comparePrice}</span>` : ''}
+          ${product.price ? `<span class="current">${product.currency || '₹'}${product.price}</span>` : `<span class="current price-check-amazon">See price on Amazon</span>`}
+          ${product.comparePrice ? `<span class="compare">${product.currency || '₹'}${product.comparePrice}</span>` : ''}
         </div>
       </div>
     </div>`;
@@ -188,7 +214,12 @@
   // ─── Carousel Engine ───
   function initCarousel(trackId, items, autoScroll = false) {
     const track = $(`#${trackId}`);
-    if (!track || !items.length) return;
+    if (!track) return;
+    if (!items.length) {
+      const sec = track.closest('section');
+      if (sec) sec.style.display = 'none';
+      return;
+    }
     track.innerHTML = items.map(p => renderProductCard(p)).join('');
     attachCardEvents(track);
     const wrapper = track.closest('.carousel-wrapper');
@@ -205,27 +236,6 @@
       wrapper.addEventListener('mouseleave', () => { interval = setInterval(() => track.scrollBy({ left: scrollAmount, behavior: 'smooth' }), 5000); });
     }
   }
-
-  // ─── Testimonials ───
-  function initTestimonials() {
-    const track = $('#testimonialTrack');
-    const dots = $('#testimonialDots');
-    if (!track || !dots) return;
-    const cards = $$('.testimonial-card', track);
-    if (cards.length === 0) return;
-    let current = 0;
-    dots.innerHTML = cards.map((_, i) => `<button class="testimonial-dot ${i === 0 ? 'active' : ''}" data-index="${i}" aria-label="Testimonial ${i + 1}"></button>`).join('');
-    function goTo(i) {
-      current = i;
-      track.style.transform = `translateX(-${current * 100}%)`;
-      $$('.testimonial-dot', dots).forEach((d, idx) => d.classList.toggle('active', idx === current));
-    }
-    $$('.testimonial-dot', dots).forEach(d => d.addEventListener('click', () => goTo(Number(d.dataset.index))));
-    setInterval(() => goTo((current + 1) % cards.length), 6000);
-  }
-
-
-  // productDescriptions loaded from products.json
 
   // Product page functions moved to js/product.js
 
@@ -256,13 +266,16 @@
               });
             } else if (anim === 'counter') {
               $$('.stat-num', el).forEach(num => {
-                const target = parseInt(num.textContent);
+                if (num.classList.contains('stat-num--static')) return;
+                const hadPlus = num.textContent.includes('+');
+                const target = parseInt(num.textContent, 10);
+                if (Number.isNaN(target)) return;
                 let count = 0;
-                const step = Math.ceil(target / 60);
+                const step = Math.max(1, Math.ceil(target / 60));
                 const timer = setInterval(() => {
                   count += step;
                   if (count >= target) { count = target; clearInterval(timer); }
-                  num.textContent = count.toLocaleString() + (num.textContent.includes('+') ? '+' : '');
+                  num.textContent = count.toLocaleString() + (hadPlus ? '+' : '');
                 }, 25);
               });
             } else if (anim === 'clip-reveal') {
@@ -404,12 +417,17 @@
     if (!form) return;
     form.addEventListener('submit', async e => {
       e.preventDefault();
+      const action = (form.getAttribute('action') || '').trim();
+      if (!action || action === '#' || !/^https?:\/\//i.test(action) || /YOUR_.+FORM_ID/i.test(action)) {
+        showToast('Newsletter', 'Add your Formspree form id in index.html (search YOUR_NEWSLETTER_FORM_ID), or email hello@devadecor.com.');
+        return;
+      }
       const email = form.querySelector('input[type="email"]').value;
       const btn = form.querySelector('button');
       btn.disabled = true;
       btn.textContent = 'Subscribing…';
       try {
-        const res = await fetch(form.action || 'https://formspree.io/f/YOUR_FORM_ID', {
+        const res = await fetch(action, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({ email })
@@ -421,8 +439,7 @@
           showToast('Oops', 'Something went wrong. Please try again.');
         }
       } catch {
-        showToast('Welcome!', 'Thank you for subscribing to Deva Decor.');
-        form.reset();
+        showToast('Error', 'Could not subscribe right now. Please try again later.');
       }
       btn.disabled = false;
       btn.textContent = 'Subscribe';
@@ -464,6 +481,11 @@
       const bSave = 1 - b.price / b.comparePrice;
       return bSave - aSave;
     }).slice(0, 6);
+    if (!deals.length) {
+      const sec = grid.closest('.deals-section');
+      if (sec) sec.style.display = 'none';
+      return;
+    }
     grid.innerHTML = deals.map(p => {
       const pct = Math.round((1 - p.price / p.comparePrice) * 100);
       return `<div class="deal-card">
@@ -476,10 +498,10 @@
           <div class="deal-card-name">${p.name}</div>
           ${renderStars(p.rating)}
           <div class="deal-card-price">
-            <span class="current">${p.currency || '$'}${p.price}</span>
-            <span class="compare">${p.currency || '$'}${p.comparePrice}</span>
+            <span class="current">${p.currency || '₹'}${p.price}</span>
+            <span class="compare">${p.currency || '₹'}${p.comparePrice}</span>
           </div>
-          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Shop Now</a>
+          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Check Price on Amazon</a>
         </div>
       </div>`;
     }).join('');
@@ -492,7 +514,7 @@
     const callout1 = $('#journalCallout1');
     const callout2 = $('#journalCallout2');
     if (!callout1 && !callout2) return;
-    const picks = [products[0], products[4]];
+    const picks = [products[0], products[Math.min(4, products.length - 1)]];
     [callout1, callout2].forEach((el, i) => {
       if (!el) return;
       const p = picks[i] || picks[0];
@@ -505,10 +527,10 @@
           <div class="product-callout-name">${p.name}</div>
           ${renderStars(p.rating)}
           <div class="product-callout-price">
-            <span class="current">${p.currency || '$'}${p.price}</span>
-            ${p.comparePrice ? `<span class="compare">${p.currency || '$'}${p.comparePrice}</span>` : ''}
+            <span class="current">${p.currency || '₹'}${p.price}</span>
+            ${p.comparePrice ? `<span class="compare">${p.currency || '₹'}${p.comparePrice}</span>` : ''}
           </div>
-          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Shop Now</a>
+          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Check Price on Amazon</a>
         </div>`;
     });
   }
@@ -587,7 +609,7 @@
   // ─── Outbound Click Tracking ───
   function initClickTracking() {
     document.addEventListener('click', e => {
-      const link = e.target.closest('a[href*="amazon.com"]');
+      const link = e.target.closest('a[href*="amazon."]');
       if (!link) return;
       if (typeof gtag === 'function') {
         gtag('event', 'click', {
@@ -659,7 +681,7 @@
     }
     function open(product) {
       if (overlay) overlay.remove();
-      const desc = productDescriptions[product.id] || 'Beautifully crafted piece to elevate your living space.';
+      const desc = product.description || 'Beautifully crafted piece to elevate your living space.';
       const amazonLink = getAmazonLink(product);
       const savePct = product.comparePrice ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
       const images = getProductImages(product);
@@ -683,13 +705,13 @@
               <h2 class="quickview-title">${product.name}</h2>
               ${renderStars(product.rating)}
               <div class="quickview-price">
-                <span class="current">${product.currency || '$'}${product.price}</span>
-                ${product.comparePrice ? `<span class="compare">${product.currency || '$'}${product.comparePrice}</span>` : ''}
+                <span class="current">${product.currency || '₹'}${product.price}</span>
+                ${product.comparePrice ? `<span class="compare">${product.currency || '₹'}${product.comparePrice}</span>` : ''}
                 ${savePct ? `<span class="quickview-save">Save ${savePct}%</span>` : ''}
               </div>
               <p class="quickview-desc">${desc}</p>
               <div class="quickview-actions">
-                <a href="${amazonLink}" target="_blank" rel="nofollow" class="btn btn-primary quickview-buy">Shop Now</a>
+                <a href="${amazonLink}" target="_blank" rel="nofollow" class="btn btn-primary quickview-buy">Check Price on Amazon</a>
                 <a href="${product.link}" class="btn btn-outline">View Details</a>
               </div>
             </div>
@@ -753,43 +775,6 @@
     }
     tick();
     setInterval(tick, 1000);
-  }
-
-  // ─── Social Proof Notifications ───
-  function initSocialProof() {
-    if (window.location.pathname.includes('product.html')) return;
-    const firstNames = ['Emma','Liam','Olivia','Noah','Ava','James','Sophia','Lucas','Isabella','Mason','Mia','Ethan','Charlotte','Logan','Amelia'];
-    const cities = ['Austin, TX','Brooklyn, NY','San Francisco, CA','Portland, OR','Denver, CO','Nashville, TN','Chicago, IL','Seattle, WA','Savannah, GA','Miami, FL'];
-    let lastId = -1;
-    function show() {
-      const pool = products.filter(p => p.id !== lastId);
-      const p = pool[Math.floor(Math.random() * pool.length)];
-      lastId = p.id;
-      const name = firstNames[Math.floor(Math.random() * firstNames.length)];
-      const city = cities[Math.floor(Math.random() * cities.length)];
-      const mins = Math.floor(Math.random() * 12) + 1;
-      const el = document.createElement('div');
-      el.className = 'social-proof';
-      el.innerHTML = `
-        <img src="${p.image}" alt="" class="social-proof-img">
-        <div class="social-proof-body">
-          <strong>${name}</strong> from ${city}
-          <span>purchased <a href="${p.link}">${p.name}</a></span>
-          <small>${mins} min ago</small>
-        </div>
-        <button class="social-proof-close" aria-label="Dismiss">&times;</button>`;
-      document.body.appendChild(el);
-      requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
-      el.querySelector('.social-proof-close').addEventListener('click', () => dismiss(el));
-      setTimeout(() => dismiss(el), 6000);
-    }
-    function dismiss(el) {
-      if (!el.parentNode) return;
-      el.classList.remove('visible');
-      setTimeout(() => el.remove(), 400);
-    }
-    setTimeout(show, 8000);
-    setInterval(show, 25000 + Math.random() * 15000);
   }
 
   // ─── Cookie Consent ───
@@ -894,48 +879,6 @@
     new MutationObserver(() => updateAllHearts()).observe(document.body, { childList: true, subtree: true });
   }
 
-  // ─── Exit-Intent Popup ───
-  function initExitIntent() {
-    if (sessionStorage.getItem('dd_exit_shown') || window.innerWidth < 768) return;
-    let shown = false;
-    document.addEventListener('mouseout', e => {
-      if (shown || e.clientY > 5 || e.relatedTarget || e.toElement) return;
-      shown = true;
-      sessionStorage.setItem('dd_exit_shown', '1');
-      const overlay = document.createElement('div');
-      overlay.className = 'exit-popup-overlay';
-      overlay.innerHTML = `
-        <div class="exit-popup">
-          <button class="exit-popup-close" aria-label="Close">&times;</button>
-          <div class="exit-popup-body">
-            <span class="exit-popup-tag">Wait — Before You Go</span>
-            <h2>Get 10% Off Your First Order</h2>
-            <p>Join 5,000+ homeowners who trust Deva Decor for curated, artisan-quality home decor.</p>
-            <form class="exit-popup-form" id="exitPopupForm">
-              <input type="email" placeholder="Enter your email" required>
-              <button type="submit" class="btn btn-primary">Claim My 10%</button>
-            </form>
-            <small>No spam. Unsubscribe anytime.</small>
-          </div>
-        </div>`;
-      document.body.appendChild(overlay);
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
-      function close() {
-        overlay.classList.remove('visible');
-        document.body.style.overflow = '';
-        setTimeout(() => overlay.remove(), 400);
-      }
-      overlay.querySelector('.exit-popup-close').addEventListener('click', close);
-      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-      overlay.querySelector('#exitPopupForm').addEventListener('submit', e => {
-        e.preventDefault();
-        showToast('Welcome!', 'Check your inbox for your 10% discount code.');
-        close();
-      });
-    });
-  }
-
   // ─── Animated Counters (already in scroll observer, this is the trigger) ───
   // Counter logic is in initScrollAnimations via data-animate="counter"
 
@@ -1030,8 +973,9 @@
   function initSmart404() {
     const grid = $('#smart404Grid');
     if (!grid) return;
-    const popular = products.filter(p => p.rating >= 4.7 || p.badge === 'Best Seller').slice(0, 6);
-    grid.innerHTML = popular.map(p => renderProductCard(p)).join('');
+    const popular = products.filter(p => p.rating >= 4.7 || p.badge === 'Best Seller');
+    const items = popular.length ? popular.slice(0, 6) : products.slice(0, 6);
+    grid.innerHTML = items.map(p => renderProductCard(p)).join('');
     attachCardEvents(grid);
   }
 
@@ -1067,61 +1011,6 @@
     });
   }
 
-  // ─── Gallery Lightbox ───
-  function initGalleryLightbox() {
-    const items = $$('.gallery-grid .gallery-item');
-    if (!items.length) return;
-    const images = items.map(item => item.querySelector('img').src.replace('w=400', 'w=1200').replace('h=400', 'h=1200').replace('h=600', 'h=1200'));
-    let currentIdx = 0;
-    function open(idx) {
-      currentIdx = idx;
-      const overlay = document.createElement('div');
-      overlay.className = 'lightbox-overlay';
-      overlay.innerHTML = `
-        <button class="lightbox-close" aria-label="Close">&times;</button>
-        <button class="lightbox-prev" aria-label="Previous"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <button class="lightbox-next" aria-label="Next"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <div class="lightbox-counter">${idx + 1} / ${images.length}</div>
-        <img class="lightbox-img" src="${images[idx]}" alt="Gallery image">`;
-      document.body.appendChild(overlay);
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
-      const img = overlay.querySelector('.lightbox-img');
-      const counter = overlay.querySelector('.lightbox-counter');
-      function navigate(dir) {
-        currentIdx = (currentIdx + dir + images.length) % images.length;
-        img.style.opacity = '0';
-        setTimeout(() => { img.src = images[currentIdx]; img.style.opacity = '1'; counter.textContent = `${currentIdx + 1} / ${images.length}`; }, 200);
-      }
-      overlay.querySelector('.lightbox-prev').addEventListener('click', () => navigate(-1));
-      overlay.querySelector('.lightbox-next').addEventListener('click', () => navigate(1));
-      overlay.querySelector('.lightbox-close').addEventListener('click', close);
-      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
-      let sx = 0;
-      overlay.addEventListener('pointerdown', e => { sx = e.clientX; });
-      overlay.addEventListener('pointerup', e => {
-        const dx = e.clientX - sx;
-        if (Math.abs(dx) > 60) navigate(dx < 0 ? 1 : -1);
-      });
-      document.addEventListener('keydown', onKey);
-      function onKey(e) {
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowLeft') navigate(-1);
-        if (e.key === 'ArrowRight') navigate(1);
-      }
-      function close() {
-        overlay.classList.remove('visible');
-        document.body.style.overflow = '';
-        document.removeEventListener('keydown', onKey);
-        setTimeout(() => overlay.remove(), 400);
-      }
-    }
-    items.forEach((item, idx) => {
-      item.addEventListener('click', e => { e.preventDefault(); open(idx); });
-    });
-  }
-
-
   // ─── Scroll-Triggered Promo Banner ───
   function initPromoBanner() {
     if (sessionStorage.getItem('dd_promo_dismissed')) return;
@@ -1134,8 +1023,8 @@
       banner.className = 'promo-banner';
       banner.innerHTML = `
         <div class="promo-banner-inner">
-          <span>First order? Use code <strong>WELCOME10</strong> for 10% off</span>
-          <a href="shop.html" class="btn btn-primary btn-sm">Shop Now</a>
+          <span>Curated Home Decor &mdash; Fulfilled by Amazon India</span>
+          <a href="shop.html" class="btn btn-primary btn-sm">Browse Collection</a>
           <button class="promo-banner-close" aria-label="Dismiss">&times;</button>
         </div>`;
       document.body.appendChild(banner);
@@ -1173,7 +1062,6 @@
     if (searchSuggestions) {
       const input = $('#searchInput');
       if (input) {
-        const origHandler = input.oninput;
         input.addEventListener('input', () => {
           setTimeout(() => {
             const noResults = searchSuggestions.querySelector('.search-no-results');
@@ -1280,25 +1168,55 @@
   }
 
   // ─── Load Product Data ───
+  let catalogLoadFailed = false;
+
   async function loadProductData() {
+    catalogLoadFailed = false;
     try {
       const res = await fetch('js/products.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
+      if (!data || !Array.isArray(data.products)) throw new Error('Invalid catalog');
       products = data.products;
-      productDescriptions = data.descriptions;
-      favoriteProducts = products.filter(p => p.badge === 'Best Seller' || p.rating >= 4.8).slice(0, 10);
+      const faves = products.filter(p => p.badge === 'Best Seller' || p.rating >= 4.8);
+      favoriteProducts = faves.length ? faves.slice(0, 10) : products.slice(0, 10);
     } catch {
+      catalogLoadFailed = true;
       products = [];
-      productDescriptions = {};
       favoriteProducts = [];
     }
     _resolveReady();
+  }
+
+  function showCatalogErrorBanner() {
+    if (!catalogLoadFailed) return;
+    const bar = document.createElement('div');
+    bar.className = 'catalog-load-banner';
+    bar.setAttribute('role', 'alert');
+    bar.innerHTML = '<p>We could not load the product catalog. Check your connection and refresh the page.</p>';
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  function initDynamicNavCategories() {
+    const col = document.getElementById('navCategoryLinks');
+    if (!col || !products.length) return;
+    const cats = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+    cats.forEach(function (cat) {
+      const a = document.createElement('a');
+      a.href = 'shop.html?cat=' + encodeURIComponent(cat.toLowerCase().replace(/\s+/g, '-'));
+      a.textContent = cat;
+      col.appendChild(a);
+    });
   }
 
   // ─── Initialize ───
   async function init() {
     initLoader();
     await loadProductData();
+    showCatalogErrorBanner();
+    const statProductCount = $('#statProductCount');
+    if (statProductCount) statProductCount.textContent = String(products.length);
+    initDynamicNavCategories();
     initNavbar();
     initTheme();
     initSearch();
@@ -1316,7 +1234,6 @@
       initCarousel('relatedTrack', related, false);
     }
 
-    initTestimonials();
     initHeroSlideshow();
     initScrollAnimations();
     initSplitText();
@@ -1340,15 +1257,12 @@
     initSectionParallax();
     initHelpWidget();
     initQuickView();
-    initSocialProof();
-    initExitIntent();
     initCarouselEnhancements();
     initFloatingLabels();
     initMobileNav();
     initSmart404();
     initStickyToolbar();
     initProgressRing();
-    initGalleryLightbox();
     initPromoBanner();
     initReadingProgress();
     initEmptyStates();
