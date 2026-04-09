@@ -23,6 +23,31 @@
     };
   }
 
+  function createFocusTrap(container) {
+    const focusableSelectors = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    function getFocusables() {
+      return [...container.querySelectorAll(focusableSelectors)].filter(el => el.offsetParent !== null);
+    }
+    function handleKeydown(e) {
+      if (e.key !== 'Tab') return;
+      const focusables = getFocusables();
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    return {
+      activate() { container.addEventListener('keydown', handleKeydown); },
+      deactivate() { container.removeEventListener('keydown', handleKeydown); }
+    };
+  }
+
   // Shared scroll bus — one rAF-throttled listener for all scroll-dependent features
   const scrollBus = {
     _cbs: [],
@@ -72,13 +97,14 @@
   };
 
   // ─── Page Loader ───
+  let loaderEl = null;
   function initLoader() {
-    const loader = $('#pageLoader');
-    if (!loader) return;
-    setTimeout(() => {
-      loader.classList.add('loaded');
-      setTimeout(() => loader.remove(), 400);
-    }, 300);
+    loaderEl = $('#pageLoader');
+  }
+  function hideLoader() {
+    if (!loaderEl) return;
+    loaderEl.classList.add('loaded');
+    setTimeout(() => loaderEl.remove(), 400);
   }
 
   // ─── Navbar ───
@@ -167,16 +193,20 @@
     const suggestions = $('#searchSuggestions');
     if (!toggle || !overlay) return;
     let previousFocus = null;
+    const searchContainer = overlay.querySelector('.search-container');
+    const focusTrap = searchContainer ? createFocusTrap(searchContainer) : null;
     function openSearch() {
       previousFocus = document.activeElement;
       overlay.removeAttribute('hidden');
       overlay.classList.add('active');
       toggle.setAttribute('aria-expanded', 'true');
+      if (focusTrap) focusTrap.activate();
       setTimeout(() => input?.focus(), 300);
     }
     function closeSearch() {
       overlay.classList.remove('active');
       toggle.setAttribute('aria-expanded', 'false');
+      if (focusTrap) focusTrap.deactivate();
       if (input) input.value = '';
       if (suggestions) suggestions.innerHTML = '';
       setTimeout(() => {
@@ -191,13 +221,33 @@
       if (e.key === 'Escape' && overlay.classList.contains('active')) closeSearch();
     });
     if (input && suggestions) {
+      function goToSearchResults() {
+        const q = input.value.trim();
+        if (q.length >= 2) {
+          window.location.href = '/shop?q=' + encodeURIComponent(q);
+        }
+      }
       const performSearch = debounce(() => {
         const q = input.value.toLowerCase().trim();
         if (q.length < 2) { suggestions.innerHTML = ''; return; }
         const matches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 5);
-        suggestions.innerHTML = matches.length ? matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('') : '<div class="search-no-results">No products found</div>';
+        const totalMatches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).length;
+        let html = '';
+        if (matches.length) {
+          html = matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('');
+          html += `<a href="/shop?q=${encodeURIComponent(input.value.trim())}" class="search-view-all">View all ${totalMatches} result${totalMatches !== 1 ? 's' : ''} →</a>`;
+        } else {
+          html = '<div class="search-no-results">No products found</div>';
+        }
+        suggestions.innerHTML = html;
       }, 200);
       input.addEventListener('input', performSearch);
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          goToSearchResults();
+        }
+      });
     }
   }
 
@@ -230,14 +280,14 @@
         <a href="${product.link}">
           <img src="${product.image}" alt="${product.name}" loading="lazy" width="600" height="800" class="${product.image.startsWith('images/') ? 'local-img' : ''}">
         </a>
-        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn">Check Price on Amazon</a>
+        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn">Buy on Amazon</a>
       </div>
       <div class="product-card-info">
         <div class="product-card-category">${product.category}</div>
         ${renderStars(product.rating)}
         <h3 class="product-card-name"><a href="${product.link}">${product.name}</a></h3>
         <div class="product-card-price">
-          ${product.price ? `<span class="current">${product.currency || '₹'}${product.price}</span>` : `<span class="current price-check-amazon">See price on Amazon</span>`}
+          ${product.price ? `<span class="current">${product.currency || '₹'}${product.price}</span>` : ''}
           ${product.comparePrice ? `<span class="compare">${product.currency || '₹'}${product.comparePrice}</span>` : ''}
         </div>
       </div>
@@ -248,7 +298,13 @@
     if (!container) return;
     $$('.product-card-name a', container).forEach(link => {
       link.addEventListener('click', e => {
-        if (document.startViewTransition) { e.preventDefault(); document.startViewTransition(() => { window.location.href = link.href; }); }
+        if (document.startViewTransition) {
+          e.preventDefault();
+          const card = link.closest('.product-card');
+          const img = card?.querySelector('.product-card-image img');
+          if (img) img.style.viewTransitionName = 'product-hero';
+          document.startViewTransition(() => { window.location.href = link.href; });
+        }
       });
     });
   }
@@ -284,16 +340,11 @@
     if (prevBtn) prevBtn.addEventListener('click', () => track.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
     if (nextBtn) nextBtn.addEventListener('click', () => track.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
     if (autoScroll) {
-      let interval = setInterval(() => {
-        const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
-        if (isAtEnd) {
-          track.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-          track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
-      }, 5000);
-      wrapper.addEventListener('mouseenter', () => clearInterval(interval));
-      wrapper.addEventListener('mouseleave', () => { 
+      let interval = null;
+      let isPaused = false;
+      
+      function startAutoScroll() {
+        if (interval) clearInterval(interval);
         interval = setInterval(() => {
           const isAtEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 10;
           if (isAtEnd) {
@@ -301,7 +352,36 @@
           } else {
             track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
           }
-        }, 5000); 
+        }, 5000);
+      }
+      
+      function pauseAutoScroll() {
+        isPaused = true;
+        if (interval) { clearInterval(interval); interval = null; }
+      }
+      
+      function resumeAutoScroll() {
+        isPaused = false;
+        startAutoScroll();
+      }
+      
+      startAutoScroll();
+      
+      wrapper.addEventListener('mouseenter', pauseAutoScroll);
+      wrapper.addEventListener('mouseleave', () => { if (!isPaused) resumeAutoScroll(); });
+      
+      track.addEventListener('touchstart', pauseAutoScroll, { passive: true });
+      track.addEventListener('touchend', () => {
+        setTimeout(() => { isPaused = false; resumeAutoScroll(); }, 3000);
+      }, { passive: true });
+      
+      track.addEventListener('pointerdown', (e) => {
+        if (e.pointerType === 'touch') pauseAutoScroll();
+      }, { passive: true });
+      
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) pauseAutoScroll();
+        else if (!isPaused) resumeAutoScroll();
       });
     }
   }
@@ -315,6 +395,7 @@
     if (slides.length < 2) return;
     let current = 0;
     let interval;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function goToSlide(index) {
       slides[current].classList.remove('active');
@@ -329,6 +410,7 @@
     }
 
     function startAutoplay() {
+      if (prefersReducedMotion) return;
       interval = setInterval(nextSlide, 6000);
     }
 
@@ -340,7 +422,7 @@
       dot.addEventListener('click', () => {
         stopAutoplay();
         goToSlide(i);
-        startAutoplay();
+        if (!prefersReducedMotion) startAutoplay();
       });
     });
 
@@ -359,7 +441,7 @@
           } else {
             goToSlide((current - 1 + slides.length) % slides.length);
           }
-          startAutoplay();
+          if (!prefersReducedMotion) startAutoplay();
         }
       }, { passive: true });
     }
@@ -459,7 +541,7 @@
       if (!cursor.classList.contains('visible')) cursor.classList.add('visible');
     });
     (function loop() {
-      cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+      cx += (tx - cx) * 0.15; cy += (ty - cy) * 0.15;
       cursor.style.transform = `translate(${cx}px, ${cy}px)`;
       requestAnimationFrame(loop);
     })();
@@ -494,7 +576,7 @@
       const rect = activeCard.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      activeCard.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+      activeCard.style.transform = `perspective(1000px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) scale(1.01)`;
     });
     document.addEventListener('mouseout', e => {
       if (activeCard && !activeCard.contains(e.relatedTarget)) {
@@ -531,17 +613,54 @@
   function initNewsletter() {
     const form = $('#newsletterForm');
     if (!form) return;
+    const emailInput = form.querySelector('input[type="email"]');
+    const errorEl = $('#newsletterError');
+    
+    function showError(msg) {
+      if (errorEl) { errorEl.textContent = msg; }
+      if (emailInput) { emailInput.setAttribute('aria-invalid', 'true'); }
+    }
+    function clearError() {
+      if (errorEl) { errorEl.textContent = ''; }
+      if (emailInput) { emailInput.removeAttribute('aria-invalid'); }
+    }
+    
+    if (emailInput) {
+      emailInput.addEventListener('input', clearError);
+      emailInput.addEventListener('blur', () => {
+        const val = emailInput.value.trim();
+        if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+          showError('Please enter a valid email address');
+        }
+      });
+    }
+    
     form.addEventListener('submit', async e => {
       e.preventDefault();
+      clearError();
+      
       const action = (form.getAttribute('action') || '').trim();
       if (!action || action === '#' || !/^https?:\/\//i.test(action) || /YOUR_.+FORM_ID/i.test(action)) {
-        showToast('Newsletter', 'Add your Formspree form id in index.html (search YOUR_NEWSLETTER_FORM_ID), or email hello.devadecor@gmail.com.');
+        showError('Newsletter signup is not configured. Email hello.devadecor@gmail.com instead.');
         return;
       }
-      const email = form.querySelector('input[type="email"]').value;
+      
+      const email = emailInput ? emailInput.value.trim() : '';
+      if (!email) {
+        showError('Please enter your email address');
+        emailInput?.focus();
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('Please enter a valid email address');
+        emailInput?.focus();
+        return;
+      }
+      
       const btn = form.querySelector('button');
       btn.disabled = true;
       btn.textContent = 'Subscribing…';
+      
       try {
         const res = await fetch(action, {
           method: 'POST',
@@ -551,11 +670,15 @@
         if (res.ok) {
           showToast('Welcome!', 'Thank you for subscribing to Deva Decor.');
           form.reset();
+          clearError();
         } else {
-          showToast('Oops', 'Something went wrong. Please try again.');
+          const errMsg = res.status === 422 ? 'This email may already be subscribed.' :
+                         res.status === 429 ? 'Too many requests. Please try again later.' :
+                         'Subscription failed. Please try again.';
+          showError(errMsg);
         }
-      } catch {
-        showToast('Error', 'Could not subscribe right now. Please try again later.');
+      } catch (err) {
+        showError('Network error. Check your connection and try again.');
       }
       btn.disabled = false;
       btn.textContent = 'Subscribe';
@@ -617,7 +740,7 @@
             <span class="current">${p.currency || '₹'}${p.price}</span>
             <span class="compare">${p.currency || '₹'}${p.comparePrice}</span>
           </div>
-          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Check Price on Amazon</a>
+          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Buy on Amazon</a>
         </div>
       </div>`;
     }).join('');
@@ -646,7 +769,7 @@
             <span class="current">${p.currency || '₹'}${p.price}</span>
             ${p.comparePrice ? `<span class="compare">${p.currency || '₹'}${p.comparePrice}</span>` : ''}
           </div>
-          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Check Price on Amazon</a>
+          <a href="${getAmazonLink(p)}" target="_blank" rel="nofollow" class="btn btn-amazon">Buy on Amazon</a>
         </div>`;
     });
   }
@@ -716,8 +839,27 @@
     header.after(share);
     const copyBtn = share.querySelector('#copyLinkBtn');
     if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href).then(() => showToast('Copied!', 'Link copied to clipboard'));
+      copyBtn.addEventListener('click', async () => {
+        const url = window.location.href;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(url);
+            showToast('Copied!', 'Link copied to clipboard');
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = url;
+            textArea.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const success = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if (success) showToast('Copied!', 'Link copied to clipboard');
+            else showToast('Copy failed', 'Please copy this URL manually: ' + url);
+          }
+        } catch (err) {
+          showToast('Copy failed', 'Please copy this URL manually');
+        }
       });
     }
   }
@@ -792,6 +934,7 @@
   function initQuickView() {
     let overlay = null;
     let previousFocus = null;
+    let focusTrap = null;
     function getProductImages(product) {
       if (product.images && product.images.length) return product.images;
       return [product.image];
@@ -802,6 +945,7 @@
       const desc = product.description || 'Beautifully crafted piece to elevate your living space.';
       const amazonLink = getAmazonLink(product);
       const savePct = product.comparePrice ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
+      const priceDisplay = `${product.currency || '₹'}${product.price}`;
       const images = getProductImages(product);
       overlay = document.createElement('div');
       overlay.className = 'quickview-overlay';
@@ -826,13 +970,13 @@
               <h2 class="quickview-title" id="qv-title">${product.name}</h2>
               ${renderStars(product.rating)}
               <div class="quickview-price">
-                <span class="current">${product.currency || '₹'}${product.price}</span>
+                <span class="current">${priceDisplay}</span>
                 ${product.comparePrice ? `<span class="compare">${product.currency || '₹'}${product.comparePrice}</span>` : ''}
                 ${savePct ? `<span class="quickview-save">Save ${savePct}%</span>` : ''}
               </div>
               <p class="quickview-desc">${desc}</p>
               <div class="quickview-actions">
-                <a href="${amazonLink}" target="_blank" rel="nofollow" class="btn btn-primary quickview-buy">Check Price on Amazon</a>
+                <a href="${amazonLink}" target="_blank" rel="nofollow" class="btn btn-primary quickview-buy">Buy on Amazon</a>
                 <a href="${product.link}" class="btn btn-outline">View Details</a>
               </div>
             </div>
@@ -840,6 +984,9 @@
         </div>`;
       document.body.appendChild(overlay);
       document.body.style.overflow = 'hidden';
+      const modal = overlay.querySelector('.quickview-modal');
+      focusTrap = createFocusTrap(modal);
+      focusTrap.activate();
       requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
       const closeBtn = overlay.querySelector('.quickview-close');
       setTimeout(() => closeBtn.focus(), 100);
@@ -861,6 +1008,7 @@
       overlay.classList.remove('visible');
       document.body.style.overflow = '';
       document.removeEventListener('keydown', onEsc);
+      if (focusTrap) focusTrap.deactivate();
       setTimeout(() => {
         if (overlay) { overlay.remove(); overlay = null; }
         if (previousFocus) previousFocus.focus();
@@ -956,6 +1104,22 @@
     const KEY = 'dd_wishlist';
     function getWishlist() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
     function saveWishlist(list) { localStorage.setItem(KEY, JSON.stringify(list)); }
+    function updateMobileNavBadge() {
+      const list = getWishlist();
+      const navItem = $('#mobileNavWishlist');
+      if (!navItem) return;
+      let badge = navItem.querySelector('.mobile-nav-badge');
+      if (list.length > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'mobile-nav-badge';
+          navItem.insertBefore(badge, navItem.firstChild.nextSibling);
+        }
+        badge.textContent = list.length;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
     function updateAllHearts() {
       const list = getWishlist();
       $$('[data-wishlist-id]').forEach(btn => {
@@ -963,6 +1127,7 @@
         btn.classList.toggle('wishlisted', list.includes(id));
         btn.setAttribute('aria-label', list.includes(id) ? 'Remove from wishlist' : 'Add to wishlist');
       });
+      updateMobileNavBadge();
     }
     document.addEventListener('click', e => {
       const btn = e.target.closest('[data-wishlist-id]');
@@ -1091,7 +1256,7 @@
     const wishlistBtn = nav.querySelector('#mobileNavWishlist');
     if (wishlistBtn) wishlistBtn.addEventListener('click', e => {
       e.preventDefault();
-      window.location.href = '/shop';
+      window.location.href = '/shop?wishlist=true';
     });
   }
 
@@ -1229,6 +1394,8 @@
   // ─── Keyboard Shortcuts Overlay ───
   function initKeyboardShortcuts() {
     let overlayEl = null;
+    let focusTrap = null;
+    let previousFocus = null;
     const shortcuts = [
       { key: '/', desc: 'Open search' },
       { key: 'T', desc: 'Toggle dark mode' },
@@ -1239,21 +1406,32 @@
     ];
     function show() {
       if (overlayEl) return;
+      previousFocus = document.activeElement;
       overlayEl = document.createElement('div');
       overlayEl.className = 'kb-shortcuts-overlay';
+      overlayEl.setAttribute('role', 'dialog');
+      overlayEl.setAttribute('aria-modal', 'true');
+      overlayEl.setAttribute('aria-label', 'Keyboard shortcuts');
       overlayEl.innerHTML = `
         <div class="kb-shortcuts-modal">
           <div class="kb-shortcuts-header">
-            <h3>Keyboard Shortcuts</h3>
+            <h3 id="kb-shortcuts-title">Keyboard Shortcuts</h3>
             <button class="kb-shortcuts-close" aria-label="Close">&times;</button>
           </div>
           <div class="kb-shortcuts-list">
             ${shortcuts.map(s => `<div class="kb-shortcut-row"><kbd>${s.key}</kbd><span>${s.desc}</span></div>`).join('')}
           </div>
         </div>`;
+      overlayEl.setAttribute('aria-labelledby', 'kb-shortcuts-title');
       document.body.appendChild(overlayEl);
       document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => requestAnimationFrame(() => overlayEl.classList.add('visible')));
+      const modal = overlayEl.querySelector('.kb-shortcuts-modal');
+      focusTrap = createFocusTrap(modal);
+      focusTrap.activate();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => overlayEl.classList.add('visible'));
+        overlayEl.querySelector('.kb-shortcuts-close').focus();
+      });
       overlayEl.querySelector('.kb-shortcuts-close').addEventListener('click', hide);
       overlayEl.addEventListener('click', e => { if (e.target === overlayEl) hide(); });
     }
@@ -1261,7 +1439,11 @@
       if (!overlayEl) return;
       overlayEl.classList.remove('visible');
       document.body.style.overflow = '';
-      setTimeout(() => { if (overlayEl) { overlayEl.remove(); overlayEl = null; } }, 400);
+      if (focusTrap) { focusTrap.deactivate(); focusTrap = null; }
+      setTimeout(() => { 
+        if (overlayEl) { overlayEl.remove(); overlayEl = null; }
+        if (previousFocus) { previousFocus.focus(); previousFocus = null; }
+      }, 400);
     }
     document.addEventListener('keydown', e => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
@@ -1352,8 +1534,6 @@
     initNewsletter();
     initSmoothScroll();
     initPageTransitions();
-    initDeals();
-    initJournalCallouts();
     initBlurUp();
     initArticleTOC();
     initSocialShare();
@@ -1366,7 +1546,6 @@
     initCarouselEnhancements();
     initFloatingLabels();
     initMobileNav();
-    initSmart404();
     initStickyToolbar();
     initProgressRing();
     initPromoBanner();
@@ -1377,6 +1556,7 @@
     registerSW();
 
     await loadProductData();
+    hideLoader();
     showCatalogErrorBanner();
 
     const statProductCount = $('#statProductCount');
@@ -1396,6 +1576,9 @@
       initCarousel('relatedTrack', related, false);
     }
 
+    initDeals();
+    initJournalCallouts();
+    initSmart404();
     initCardTilt();
     initQuickView();
     initRecentlyViewed();

@@ -51,8 +51,25 @@
     const params = new URLSearchParams(window.location.search);
     const paramId = params.get('id');
     const id = paramId ? parseInt(paramId, 10) : parseInt(detail.dataset.productId, 10);
-    const product = products.find(p => p.id === id) || products[0];
-    if (!product) return;
+    const product = products.find(p => p.id === id);
+    
+    if (!product) {
+      detail.innerHTML = `
+        <div class="product-not-found">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <path d="M8 8l6 6M14 8l-6 6"/>
+          </svg>
+          <h2>Product Not Found</h2>
+          <p>Sorry, we couldn't find the product you're looking for. It may have been removed or the link might be incorrect.</p>
+          <div class="product-not-found-actions">
+            <a href="/shop" class="btn btn-primary">Browse All Products</a>
+            <a href="/" class="btn btn-outline">Return Home</a>
+          </div>
+        </div>`;
+      document.title = 'Product Not Found — Deva Decor';
+      return;
+    }
 
     const titleEl = $('.product-title');
     const priceEl = $('.price-current');
@@ -66,12 +83,7 @@
     const cur = product.currency || '₹';
     if (titleEl) titleEl.textContent = product.name;
     if (priceEl) {
-      if (product.price) {
-        priceEl.textContent = cur + product.price;
-      } else {
-        priceEl.textContent = 'See price on Amazon';
-        priceEl.classList.add('price-check-amazon');
-      }
+      priceEl.textContent = cur + product.price;
     }
     if (compareEl) {
       if (product.comparePrice) {
@@ -93,8 +105,12 @@
     if (brandEl && product.brand) brandEl.textContent = product.brand;
 
     const bulletsList = $('#bulletsList');
-    if (bulletsList && product.bullets && product.bullets.length) {
-      bulletsList.innerHTML = product.bullets.map(b => `<li>${escHtml(b)}</li>`).join('');
+    if (bulletsList) {
+      if (product.bullets && product.bullets.length) {
+        bulletsList.innerHTML = product.bullets.map(b => `<li>${escHtml(b)}</li>`).join('');
+      } else {
+        bulletsList.innerHTML = '<li>Premium quality materials</li><li>Carefully curated design</li><li>See product description for details</li>';
+      }
     }
 
     const descContent = $('#descriptionContent');
@@ -214,12 +230,26 @@
         overlay.innerHTML = `<img src="${main.src}" alt="Zoomed view"><button class="gallery-lightbox-close" aria-label="Close lightbox">&times;</button>`;
         document.body.appendChild(overlay);
         const closeBtn = overlay.querySelector('.gallery-lightbox-close');
+        
+        function trapFocus(e) {
+          if (e.key !== 'Tab') return;
+          const focusables = [].slice.call(overlay.querySelectorAll('button, [tabindex]:not([tabindex="-1"])')).filter(el => el.offsetParent !== null);
+          if (!focusables.length) return;
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+        
         requestAnimationFrame(() => {
           overlay.classList.add('active');
           closeBtn.focus();
         });
+        overlay.addEventListener('keydown', trapFocus);
+        
         function closeLightbox() {
           overlay.classList.remove('active');
+          overlay.removeEventListener('keydown', trapFocus);
           setTimeout(() => {
             overlay.remove();
             if (previousFocus) previousFocus.focus();
@@ -286,7 +316,7 @@
     bar.className = 'sticky-atc';
     const titleEl = $('.product-title');
     const priceEl = $('.price-current');
-    bar.innerHTML = `<span class="sticky-atc-name">${titleEl ? titleEl.textContent : ''}</span><span class="sticky-atc-price">${priceEl ? priceEl.textContent : ''}</span><a href="${mainBtn.href}" target="_blank" rel="nofollow" class="btn btn-primary">Check Price on Amazon</a>`;
+    bar.innerHTML = `<span class="sticky-atc-name">${titleEl ? titleEl.textContent : ''}</span><span class="sticky-atc-price">${priceEl ? priceEl.textContent : ''}</span><a href="${mainBtn.href}" target="_blank" rel="nofollow" class="btn btn-primary">Buy on Amazon</a>`;
     document.body.appendChild(bar);
     const observer = new IntersectionObserver(entries => {
       bar.classList.toggle('visible', !entries[0].isIntersecting);

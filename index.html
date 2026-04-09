@@ -66,11 +66,11 @@
                 <a href="/room-dining">Dining Room</a>
               </div>
               <div class="dropdown-col dropdown-featured">
-                <div class="dropdown-card">
+                <a href="/shop?filter=new" class="dropdown-card">
                   <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop&fm=webp&q=80" alt="New Collection" loading="lazy" width="300" height="200">
                   <h4>The Spring Collection</h4>
                   <p>Discover fresh designs</p>
-                </div>
+                </a>
               </div>
             </div>
           </div>
@@ -254,7 +254,7 @@
           <p class="section-desc">Thoughtfully curated collections to match every aesthetic and mood.</p>
         </div>
         <div class="collections-grid" data-animate="fade-up">
-          <a href="/shop" class="collection-card collection-card-lg">
+          <a href="/shop?style=minimalist" class="collection-card collection-card-lg">
             <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&h=450&fit=crop&fm=webp&q=80" 
                  srcset="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&h=300&fit=crop&fm=webp&q=80 400w,
                          https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&h=450&fit=crop&fm=webp&q=80 600w,
@@ -265,7 +265,7 @@
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="/shop" class="collection-card">
+          <a href="/shop?style=cozy" class="collection-card">
             <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=267&fit=crop&fm=webp&q=80" 
                  srcset="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=300&h=200&fit=crop&fm=webp&q=80 300w,
                          https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=267&fit=crop&fm=webp&q=80 400w,
@@ -276,7 +276,7 @@
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="/shop" class="collection-card">
+          <a href="/shop?style=scandi" class="collection-card">
             <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=267&fit=crop&fm=webp&q=80" 
                  srcset="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=300&h=200&fit=crop&fm=webp&q=80 300w,
                          https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=267&fit=crop&fm=webp&q=80 400w,
@@ -287,7 +287,7 @@
               <span class="collection-link">View Collection →</span>
             </div>
           </a>
-          <a href="/shop" class="collection-card collection-card-lg">
+          <a href="/shop?style=luxury" class="collection-card collection-card-lg">
             <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=450&fit=crop&fm=webp&q=80" 
                  srcset="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop&fm=webp&q=80 400w,
                          https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=450&fit=crop&fm=webp&q=80 600w,
@@ -392,36 +392,65 @@
       </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Social Proof / Trust Section -->
     <section class="section" id="testimonials">
       <div class="container">
         <div class="section-header" data-animate="blur-in">
           <span class="section-accent-line"></span>
-          <span class="section-tag">Reviews</span>
-          <h2 class="section-title">What Our Customers Say</h2>
+          <span class="section-tag">Why Shop With Us</span>
+          <h2 class="section-title">Trusted by Decor Enthusiasts</h2>
         </div>
-        <div class="testimonials-carousel testimonials-carousel--simple" data-animate="fade-up">
-          <div class="testimonial-track" id="testimonialTrack">
-            <p class="testimonials-trust-message">Trusted by home decor enthusiasts across India</p>
+        <div class="trust-grid" data-animate="fade-up">
+          <div class="trust-card">
+            <div class="trust-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.77 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <h3>Curated Selection</h3>
+            <p>Every piece handpicked for quality, style, and value. Only the best makes it to our collection.</p>
           </div>
-          <div class="testimonial-dots" id="testimonialDots" hidden aria-hidden="true"></div>
+          <div class="trust-card">
+            <div class="trust-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3>Secure Shopping</h3>
+            <p>Shop confidently through Amazon's trusted platform with buyer protection and easy returns.</p>
+          </div>
+          <div class="trust-card">
+            <div class="trust-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <h3>Pan-India Delivery</h3>
+            <p>Fast delivery across India with Amazon Prime benefits. Your new decor, at your doorstep.</p>
+          </div>
+          <div class="trust-card">
+            <div class="trust-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3>Community Love</h3>
+            <p>Join thousands of happy customers who've transformed their homes with Deva Decor.</p>
+          </div>
+        </div>
+        <div class="trust-cta" data-animate="fade-up">
+          <p>See what customers are saying about our products on Amazon</p>
+          <a href="/shop" class="btn btn-outline">Browse Products & Reviews</a>
         </div>
       </div>
     </section>
 
     <!-- Newsletter Section -->
-    <section class="newsletter-section" id="newsletter">
+    <section class="newsletter-section" id="newsletter" style="display:none">
       <div class="container">
         <div class="newsletter-content" data-animate="scale-in">
           <span class="section-tag">Stay Connected</span>
           <h2 class="section-title">Join the Deva Family</h2>
           <p>Subscribe for curated decor picks, styling tips, and exclusive Amazon deals delivered to your inbox.</p>
-          <form class="newsletter-form" id="newsletterForm" method="post" action="https://formspree.io/f/xpwzgvkr">
+          <form class="newsletter-form" id="newsletterForm" method="post" action="https://formspree.io/f/xpwzgvkr" novalidate>
             <div class="newsletter-input-wrap">
               <label for="newsletterEmail" class="visually-hidden">Email address</label>
-              <input type="email" id="newsletterEmail" name="email" placeholder="Your email address" required autocomplete="email">
+              <input type="email" id="newsletterEmail" name="email" placeholder="Your email address" required autocomplete="email" aria-describedby="newsletterError">
               <button type="submit" class="btn btn-primary">Subscribe</button>
             </div>
+            <p class="newsletter-error" id="newsletterError" role="alert" aria-live="polite"></p>
             <p class="newsletter-note">By subscribing, you agree to our <a href="/privacy">Privacy Policy</a>. Unsubscribe anytime.</p>
           </form>
         </div>
@@ -454,7 +483,7 @@
           <h4>Support</h4>
           <a href="/contact">Contact Us</a>
           <a href="/contact#faq">FAQ</a>
-          <a href="/contact">Shipping &amp; Returns</a>
+          <a href="/contact#shipping">Shipping &amp; Returns</a>
           <a href="/privacy">Privacy Policy</a>
         </div>
       </div>
@@ -510,12 +539,13 @@
           grid.closest('.section').style.display = 'none';
           return;
         }
+        var placeholderImg = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="700" fill="%23f5f5f5"%3E%3Crect width="100%25" height="100%25"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%23999" font-family="system-ui" font-size="24"%3ENo Image%3C/text%3E%3C/svg%3E';
         grid.innerHTML = catNames.map(function(name) {
           var slug = name.toLowerCase().replace(/\s+/g, '-');
-          var img = cats[name];
+          var img = cats[name] || placeholderImg;
           return '<a href="/shop?cat=' + slug + '" class="category-card" data-animate="clip-reveal">' +
             '<div class="category-img">' +
-            '<img src="' + img + '" alt="' + name + '" loading="lazy" width="600" height="700">' +
+            '<img src="' + img + '" alt="' + name + '" loading="lazy" width="600" height="700" onerror="this.src=\'' + placeholderImg + '\'">' +
             '</div>' +
             '<div class="category-info"><h3>' + name + '</h3></div></a>';
         }).join('');

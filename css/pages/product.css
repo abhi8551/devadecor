@@ -1068,3 +1068,35 @@
 .btn-whatsapp-bulk svg {
   flex-shrink: 0;
 }
+
+/* --- Product Not Found State --- */
+.product-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px;
+  min-height: 50vh;
+  color: var(--color-text-muted);
+}
+.product-not-found svg {
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+.product-not-found h2 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+  color: var(--color-text);
+}
+.product-not-found p {
+  max-width: 400px;
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+.product-not-found-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}

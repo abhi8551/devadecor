@@ -125,7 +125,7 @@
       </ul>
 
       <div class="nav-actions">
-        <button class="nav-action-btn search-toggle" id="searchToggle" aria-label="Search">
+        <button class="nav-action-btn search-toggle" id="searchToggle" aria-label="Search" aria-controls="searchOverlay" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         </button>
         <button class="nav-action-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
@@ -139,8 +139,9 @@
     </div>
 
     <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay">
+    <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Search products" hidden>
       <div class="search-container">
+        <label for="searchInput" class="visually-hidden">Search products</label>
         <input type="text" class="search-input" id="searchInput" placeholder="Search for products, collections..." autocomplete="off">
         <button class="search-close" id="searchClose" aria-label="Close search">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -163,7 +164,7 @@
 
     <div class="container">
       <div class="shop-layout">
-        <aside class="filter-sidebar" id="filterSidebar" aria-label="Product filters">
+        <aside class="filter-sidebar" id="filterSidebar" aria-label="Product filters" aria-hidden="true">
           <button type="button" class="filter-sidebar-close" id="filterClose" aria-label="Close filters">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -291,6 +292,7 @@
         const viewBtns = document.querySelectorAll('.view-btn');
 
         let allProducts = DD.products.slice();
+        window.__originalProducts = allProducts.slice();
         const selectedCategories = new Set();
         const priceMax = allProducts.length ? Math.ceil(Math.max(...allProducts.map(p => p.price)) / 100) * 100 : 500;
         let maxPrice = priceMax;
@@ -337,6 +339,19 @@
           document.title = 'Search: ' + qParam + ' — Deva Decor';
         }
 
+        var wishlistParam = new URLSearchParams(window.location.search).get('wishlist');
+        if (wishlistParam === 'true') {
+          var wishlistIds = JSON.parse(localStorage.getItem('dd_wishlist') || '[]');
+          allProducts = allProducts.filter(function (p) {
+            return wishlistIds.includes(p.id);
+          });
+          var pageH1w = document.querySelector('.page-header h1');
+          var pagePw = document.querySelector('.page-header p');
+          if (pageH1w) pageH1w.textContent = 'My Wishlist';
+          if (pagePw) pagePw.textContent = allProducts.length + ' item' + (allProducts.length !== 1 ? 's' : '') + ' saved';
+          document.title = 'Wishlist — Deva Decor';
+        }
+
         var catNoticeEl = document.getElementById('shopCatNotice');
         var catParam = new URLSearchParams(window.location.search).get('cat');
         if (catParam) {
@@ -370,6 +385,52 @@
             var metaDesc = document.querySelector('meta[name="description"]');
             if (metaDesc) metaDesc.setAttribute('content', 'Shop premium ' + catName.toLowerCase() + ' at Deva Decor. Curated picks with honest reviews.');
           }
+        }
+
+        var styleParam = new URLSearchParams(window.location.search).get('style');
+        var filterParam = new URLSearchParams(window.location.search).get('filter');
+        
+        var styleLabels = {
+          'minimalist': 'Modern Minimalism',
+          'cozy': 'Cozy & Warm',
+          'boho': 'Bohemian Vibes',
+          'classic': 'Classic Elegance'
+        };
+        
+        if (styleParam && styleLabels[styleParam.toLowerCase()]) {
+          var styleLabel = styleLabels[styleParam.toLowerCase()];
+          var styleTerms = styleParam.toLowerCase().split(/[-_]/);
+          allProducts = allProducts.filter(function (p) {
+            var name = p.name.toLowerCase();
+            var cat = p.category.toLowerCase();
+            return styleTerms.some(function (term) { 
+              return name.includes(term) || cat.includes(term); 
+            });
+          });
+          if (allProducts.length === 0) {
+            allProducts = window.__originalProducts || allProducts;
+          }
+          var pageH1s = document.querySelector('.page-header h1');
+          var pagePs = document.querySelector('.page-header p');
+          if (pageH1s) pageH1s.textContent = styleLabel;
+          if (pagePs) pagePs.textContent = 'Explore our ' + styleLabel.toLowerCase() + ' collection.';
+          document.title = styleLabel + ' — Deva Decor';
+        }
+        
+        if (filterParam === 'new') {
+          var now = Date.now();
+          var thirtyDays = 30 * 24 * 60 * 60 * 1000;
+          allProducts = allProducts.filter(function (p) {
+            return p.dateAdded && (now - new Date(p.dateAdded).getTime()) < thirtyDays;
+          });
+          if (allProducts.length === 0) {
+            allProducts = (window.__originalProducts || []).slice(0, 8);
+          }
+          var pageH1f = document.querySelector('.page-header h1');
+          var pagePf = document.querySelector('.page-header p');
+          if (pageH1f) pageH1f.textContent = 'New Arrivals';
+          if (pagePf) pagePf.textContent = 'Fresh additions to our collection.';
+          document.title = 'New Arrivals — Deva Decor';
         }
 
         function sortList(list, mode) {
@@ -508,31 +569,114 @@
             else selectedCategories.delete(inp.value);
             visibleCount = PAGE;
             render(true);
+            updateURLFilters();
           });
         });
 
+        function debounce(fn, delay) {
+          var timeout;
+          return function() {
+            var args = arguments;
+            var context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(function() { fn.apply(context, args); }, delay);
+          };
+        }
+        
+        function updateURLFilters() {
+          var params = new URLSearchParams(window.location.search);
+          if (selectedCategories.size === 1) {
+            var cat = Array.from(selectedCategories)[0];
+            params.set('cat', cat.toLowerCase().replace(/\s+/g, '-'));
+          } else if (selectedCategories.size === 0 && params.has('cat')) {
+            params.delete('cat');
+          }
+          if (maxPrice < priceMax) {
+            params.set('maxPrice', maxPrice);
+          } else {
+            params.delete('maxPrice');
+          }
+          var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          history.replaceState(null, '', newUrl);
+        }
+        
+        var debouncedRender = debounce(function() {
+          visibleCount = PAGE;
+          render(true);
+          updateURLFilters();
+        }, 150);
+        
         priceRange.addEventListener('input', function () {
           maxPrice = Number(priceRange.value);
           priceRangeLabel.textContent = currSymbol + maxPrice;
-          visibleCount = PAGE;
-          render(true);
+          debouncedRender();
         });
+        
+        var maxPriceParam = new URLSearchParams(window.location.search).get('maxPrice');
+        if (maxPriceParam) {
+          var urlMaxPrice = Number(maxPriceParam);
+          if (urlMaxPrice > 0 && urlMaxPrice <= priceMax) {
+            maxPrice = urlMaxPrice;
+            priceRange.value = maxPrice;
+            priceRangeLabel.textContent = currSymbol + maxPrice;
+          }
+        }
 
 
+        var filterFocusTrap = null;
+        var previousFocusElement = null;
+        
+        function createFilterFocusTrap(container) {
+          var focusableSelectors = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+          function getFocusables() {
+            return [].slice.call(container.querySelectorAll(focusableSelectors)).filter(function(el) { return el.offsetParent !== null; });
+          }
+          function handleKeydown(e) {
+            if (e.key !== 'Tab') return;
+            var focusables = getFocusables();
+            if (!focusables.length) return;
+            var first = focusables[0];
+            var last = focusables[focusables.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+              e.preventDefault();
+              last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+          return {
+            activate: function() { container.addEventListener('keydown', handleKeydown); },
+            deactivate: function() { container.removeEventListener('keydown', handleKeydown); }
+          };
+        }
+        
         function openFilterDrawer() {
+          previousFocusElement = document.activeElement;
           filterSidebar.classList.add('active');
+          filterSidebar.setAttribute('role', 'dialog');
+          filterSidebar.setAttribute('aria-modal', 'true');
+          filterSidebar.setAttribute('aria-hidden', 'false');
           filterBackdrop.classList.add('active');
           filterBackdrop.setAttribute('aria-hidden', 'false');
           filterDrawerToggle.setAttribute('aria-expanded', 'true');
           document.body.classList.add('no-scroll');
+          filterFocusTrap = createFilterFocusTrap(filterSidebar);
+          filterFocusTrap.activate();
+          filterClose.focus();
         }
 
         function closeFilterDrawer() {
           filterSidebar.classList.remove('active');
+          filterSidebar.removeAttribute('role');
+          filterSidebar.removeAttribute('aria-modal');
+          filterSidebar.setAttribute('aria-hidden', 'true');
           filterBackdrop.classList.remove('active');
           filterBackdrop.setAttribute('aria-hidden', 'true');
           filterDrawerToggle.setAttribute('aria-expanded', 'false');
           document.body.classList.remove('no-scroll');
+          if (filterFocusTrap) { filterFocusTrap.deactivate(); filterFocusTrap = null; }
+          if (previousFocusElement) { previousFocusElement.focus(); previousFocusElement = null; }
         }
 
         filterDrawerToggle.addEventListener('click', function () {
@@ -541,6 +685,12 @@
         });
         filterClose.addEventListener('click', closeFilterDrawer);
         filterBackdrop.addEventListener('click', closeFilterDrawer);
+        
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && filterSidebar.classList.contains('active')) {
+            closeFilterDrawer();
+          }
+        });
 
         viewBtns.forEach(function (btn) {
           btn.addEventListener('click', function () {
