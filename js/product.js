@@ -107,6 +107,13 @@
     }
 
     if (amazonBtn) amazonBtn.href = D.getAmazonLink(product);
+
+    var whatsappBtn = $('#whatsappQuote');
+    if (whatsappBtn && product.name) {
+      var msg = encodeURIComponent('Hi, I\'d like a bulk quote for: ' + product.name);
+      whatsappBtn.href = 'https://wa.me/919251130947?text=' + msg;
+    }
+
     const reviewsLink = $('#reviewsAmazonLink');
     if (reviewsLink) reviewsLink.href = D.getAmazonLink(product);
     if (ratingContainer) ratingContainer.innerHTML = D.renderStars(product.rating);

@@ -419,7 +419,7 @@
       e.preventDefault();
       const action = (form.getAttribute('action') || '').trim();
       if (!action || action === '#' || !/^https?:\/\//i.test(action) || /YOUR_.+FORM_ID/i.test(action)) {
-        showToast('Newsletter', 'Add your Formspree form id in index.html (search YOUR_NEWSLETTER_FORM_ID), or email hello@devadecor.com.');
+        showToast('Newsletter', 'Add your Formspree form id in index.html (search YOUR_NEWSLETTER_FORM_ID), or email hello.devadecor@gmail.com.');
         return;
       }
       const email = form.querySelector('input[type="email"]').value;
