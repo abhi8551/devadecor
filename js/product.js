@@ -146,19 +146,21 @@
     const images = product.images && product.images.length ? product.images : [product.image];
     if (mainImg) { mainImg.src = images[0]; mainImg.alt = product.name; }
     const thumbContainer = $('.gallery-thumbs');
+    const galleryRoot = $('.product-gallery');
     if (thumbContainer) {
       thumbContainer.innerHTML = images.map((img, i) =>
-        `<button class="gallery-thumb${i === 0 ? ' active' : ''}" data-img="${img}">
-          <img src="${img}" alt="${product.name} view ${i + 1}" loading="lazy" width="150" height="150">
+        `<button type="button" class="gallery-thumb${i === 0 ? ' active' : ''}" data-img="${img}" data-idx="${i}" aria-label="View image ${i + 1} of ${images.length}">
+          <img src="${img}" alt="" loading="lazy" width="150" height="150">
         </button>`
       ).join('');
-      initProductGallery();
+      initProductGallery(images, product.name);
     }
+    if (galleryRoot) galleryRoot.classList.add('is-ready');
 
     const breadcrumb = $('.breadcrumb .container');
     if (breadcrumb) {
       const catSlug = product.category.toLowerCase().replace(/\s+/g, '-');
-      breadcrumb.innerHTML = `<a href="/">Home</a><span>/</span><a href="/shop?cat=${catSlug}">${product.category}</a><span>/</span><span>${product.name}</span>`;
+      breadcrumb.innerHTML = `<a href="/">Home</a><span>/</span><a href="/shop?cat=${catSlug}">${escHtml(product.category)}</a><span>/</span><span>${escHtml(product.name)}</span>`;
     }
 
     document.title = product.name + ' — Deva Decor';
@@ -205,94 +207,144 @@
     if (schemaEl) schemaEl.textContent = JSON.stringify(schema);
   }
 
-  // ─── Product Gallery ───
-  function initProductGallery() {
+  // ─── Product Gallery (thumbs, swipe, lightbox with nav + keyboard) ───
+  function initProductGallery(imageList, productName) {
     const main = $('#mainImage');
     const thumbs = $$('.gallery-thumb');
-    if (!main || !thumbs.length) return;
-    thumbs.forEach(t => {
-      t.addEventListener('click', () => {
-        thumbs.forEach(th => th.classList.remove('active'));
-        t.classList.add('active');
-        main.style.opacity = '0';
-        setTimeout(() => { main.src = t.dataset.img; main.style.opacity = '1'; }, 200);
-      });
+    const galleryMain = $('.gallery-main');
+    if (!main || !thumbs.length || !imageList.length) return;
+
+    let currentIdx = 0;
+
+    function showIndex(idx) {
+      currentIdx = Math.max(0, Math.min(idx, thumbs.length - 1));
+      thumbs.forEach((th, i) => th.classList.toggle('active', i === currentIdx));
+      const src = thumbs[currentIdx].dataset.img;
+      main.style.opacity = '0';
+      setTimeout(() => {
+        main.src = src;
+        main.alt = `${productName} — image ${currentIdx + 1} of ${thumbs.length}`;
+        main.style.opacity = '1';
+      }, 160);
+    }
+
+    thumbs.forEach((t, i) => {
+      t.addEventListener('click', () => showIndex(i));
     });
+
+    function openLightbox(startIdx) {
+      const previousFocus = document.activeElement;
+      let idx = Math.max(0, Math.min(startIdx, imageList.length - 1));
+      const overlay = document.createElement('div');
+      overlay.className = 'lightbox-overlay gallery-lightbox-root';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Product images');
+
+      const hasMany = imageList.length > 1;
+      overlay.innerHTML = `
+        <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
+        ${hasMany ? `<button type="button" class="lightbox-prev" aria-label="Previous image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>` : ''}
+        ${hasMany ? `<button type="button" class="lightbox-next" aria-label="Next image"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>` : ''}
+        <img class="lightbox-img" src="" alt="">
+        ${hasMany ? `<div class="lightbox-counter" aria-live="polite"></div>` : ''}
+      `;
+      document.body.appendChild(overlay);
+      const imgEl = overlay.querySelector('.lightbox-img');
+      const closeBtn = overlay.querySelector('.lightbox-close');
+      const prevBtn = overlay.querySelector('.lightbox-prev');
+      const nextBtn = overlay.querySelector('.lightbox-next');
+      const counterEl = overlay.querySelector('.lightbox-counter');
+
+      function paint() {
+        imgEl.src = imageList[idx];
+        imgEl.alt = `${productName} — enlarged ${idx + 1} of ${imageList.length}`;
+        if (counterEl) counterEl.textContent = `${idx + 1} / ${imageList.length}`;
+      }
+
+      function getFocusables() {
+        return [].slice.call(overlay.querySelectorAll('button:not([disabled])')).filter(el => el.offsetParent !== null);
+      }
+      function trapFocus(e) {
+        if (e.key !== 'Tab') return;
+        const focusables = getFocusables();
+        if (focusables.length < 2) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+
+      function closeLightbox() {
+        overlay.classList.remove('visible');
+        document.body.classList.remove('lightbox-open');
+        overlay.removeEventListener('keydown', trapFocus);
+        document.removeEventListener('keydown', onDocKey);
+        setTimeout(() => {
+          overlay.remove();
+          if (previousFocus) previousFocus.focus();
+        }, 280);
+      }
+
+      function onDocKey(e) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeLightbox();
+          return;
+        }
+        if (!hasMany) return;
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          idx = (idx - 1 + imageList.length) % imageList.length;
+          paint();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          idx = (idx + 1) % imageList.length;
+          paint();
+        }
+      }
+
+      paint();
+      requestAnimationFrame(() => {
+        overlay.classList.add('visible');
+        document.body.classList.add('lightbox-open');
+        closeBtn.focus();
+      });
+      overlay.addEventListener('keydown', trapFocus);
+      document.addEventListener('keydown', onDocKey);
+
+      closeBtn.addEventListener('click', e => { e.stopPropagation(); closeLightbox(); });
+      overlay.addEventListener('click', e => { if (e.target === overlay) closeLightbox(); });
+      if (prevBtn) prevBtn.addEventListener('click', e => { e.stopPropagation(); idx = (idx - 1 + imageList.length) % imageList.length; paint(); });
+      if (nextBtn) nextBtn.addEventListener('click', e => { e.stopPropagation(); idx = (idx + 1) % imageList.length; paint(); });
+    }
+
     const zoom = $('#galleryZoom');
     if (zoom) {
-      zoom.addEventListener('click', () => {
-        const previousFocus = document.activeElement;
-        const overlay = document.createElement('div');
-        overlay.className = 'gallery-lightbox';
-        overlay.setAttribute('role', 'dialog');
-        overlay.setAttribute('aria-modal', 'true');
-        overlay.setAttribute('aria-label', 'Zoomed product image');
-        overlay.innerHTML = `<img src="${main.src}" alt="Zoomed view"><button class="gallery-lightbox-close" aria-label="Close lightbox">&times;</button>`;
-        document.body.appendChild(overlay);
-        const closeBtn = overlay.querySelector('.gallery-lightbox-close');
-        
-        function trapFocus(e) {
-          if (e.key !== 'Tab') return;
-          const focusables = [].slice.call(overlay.querySelectorAll('button, [tabindex]:not([tabindex="-1"])')).filter(el => el.offsetParent !== null);
-          if (!focusables.length) return;
-          const first = focusables[0];
-          const last = focusables[focusables.length - 1];
-          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-        }
-        
-        requestAnimationFrame(() => {
-          overlay.classList.add('active');
-          closeBtn.focus();
-        });
-        overlay.addEventListener('keydown', trapFocus);
-        
-        function closeLightbox() {
-          overlay.classList.remove('active');
-          overlay.removeEventListener('keydown', trapFocus);
-          setTimeout(() => {
-            overlay.remove();
-            if (previousFocus) previousFocus.focus();
-          }, 300);
-        }
-        function onKeydown(e) {
-          if (e.key === 'Escape') {
-            closeLightbox();
-            document.removeEventListener('keydown', onKeydown);
-          }
-        }
-        document.addEventListener('keydown', onKeydown);
-        closeBtn.addEventListener('click', e => {
-          e.stopPropagation();
-          closeLightbox();
-          document.removeEventListener('keydown', onKeydown);
-        });
-        overlay.addEventListener('click', e => {
-          if (e.target === overlay) {
-            closeLightbox();
-            document.removeEventListener('keydown', onKeydown);
-          }
-        });
+      zoom.addEventListener('click', () => openLightbox(currentIdx));
+    }
+    if (galleryMain) {
+      galleryMain.addEventListener('click', e => {
+        if (e.target === main || e.target.closest('#mainImage')) openLightbox(currentIdx);
       });
     }
-  }
 
-  // ─── Gallery Swipe (Mobile) ───
-  function initGallerySwipe() {
-    const galleryMain = $('.gallery-main');
-    const mainImg = $('#mainImage');
-    const thumbs = $$('.gallery-thumb');
-    if (!galleryMain || !mainImg || thumbs.length < 2 || window.innerWidth >= 1024) return;
-    let currentIdx = 0, startX = 0, diffX = 0;
-    galleryMain.addEventListener('touchstart', e => { startX = e.touches[0].clientX; diffX = 0; }, { passive: true });
-    galleryMain.addEventListener('touchmove', e => { diffX = e.touches[0].clientX - startX; }, { passive: true });
-    galleryMain.addEventListener('touchend', () => {
-      if (Math.abs(diffX) < 40) return;
-      currentIdx = diffX < 0 ? Math.min(currentIdx + 1, thumbs.length - 1) : Math.max(currentIdx - 1, 0);
-      thumbs.forEach((t, i) => t.classList.toggle('active', i === currentIdx));
-      mainImg.style.opacity = '0';
-      setTimeout(() => { mainImg.src = thumbs[currentIdx].dataset.img; mainImg.style.opacity = '1'; }, 200);
-    });
+    if (galleryMain && thumbs.length >= 2) {
+      let startX = 0;
+      let diffX = 0;
+      galleryMain.addEventListener('touchstart', e => { startX = e.touches[0].clientX; diffX = 0; }, { passive: true });
+      galleryMain.addEventListener('touchmove', e => { diffX = e.touches[0].clientX - startX; }, { passive: true });
+      galleryMain.addEventListener('touchend', () => {
+        if (Math.abs(diffX) < 48) return;
+        if (diffX < 0) showIndex(currentIdx + 1);
+        else showIndex(currentIdx - 1);
+      });
+    }
   }
 
   // ─── Hover Zoom ───
@@ -402,7 +454,6 @@
       return;
     }
     initProductPage();
-    initGallerySwipe();
     initHoverZoom();
     initStickyATC();
     initImageMagnifier();

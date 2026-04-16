@@ -29,12 +29,68 @@
   align-items: start;
 }
 
+/* PDP loading skeleton (hero + thumbs) — overlay until data paints */
+.product-gallery {
+  position: relative;
+}
+.pdp-gallery-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--color-bg);
+  transition: opacity 0.35s ease;
+}
+.product-gallery.is-ready .pdp-gallery-skeleton {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.pdp-skeleton-main {
+  aspect-ratio: 4/5;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--color-bg-alt) 25%, var(--color-border) 50%, var(--color-bg-alt) 75%);
+  background-size: 200% 100%;
+  animation: pdp-shimmer 1.4s ease-in-out infinite;
+}
+.pdp-skeleton-thumbs {
+  display: flex;
+  gap: 10px;
+}
+.pdp-skeleton-thumbs span {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--color-bg-alt) 25%, var(--color-border) 50%, var(--color-bg-alt) 75%);
+  background-size: 200% 100%;
+  animation: pdp-shimmer 1.4s ease-in-out infinite;
+}
+.pdp-skeleton-thumbs span:nth-child(2) { animation-delay: 0.1s; }
+.pdp-skeleton-thumbs span:nth-child(3) { animation-delay: 0.2s; }
+.pdp-skeleton-thumbs span:nth-child(4) { animation-delay: 0.3s; }
+@keyframes pdp-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pdp-skeleton-main,
+  .pdp-skeleton-thumbs span {
+    animation: none;
+    background: var(--color-bg-alt);
+  }
+}
+
 .gallery-main {
   position: relative;
   border-radius: var(--radius-lg);
   aspect-ratio: 4/5;
   background: var(--color-bg-alt);
   overflow: hidden;
+  cursor: zoom-in;
 }
 
 .gallery-main img {
@@ -136,8 +192,12 @@
   color: var(--color-text-muted);
 }
 
+body.lightbox-open {
+  overflow: hidden;
+}
+
 .product-title {
-  font-size: 2rem;
+  font-size: var(--text-commerce-title-pdp);
   margin-bottom: 16px;
 }
 
@@ -149,13 +209,13 @@
 }
 
 .price-current {
-  font-size: 1.5rem;
+  font-size: var(--text-commerce-price-pdp);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .price-compare {
-  font-size: 1.05rem;
+  font-size: var(--text-commerce-compare-pdp);
   text-decoration: line-through;
   color: var(--color-text-muted);
 }

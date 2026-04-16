@@ -23,6 +23,21 @@
     };
   }
 
+  function safeJsonParse(str, fallback) {
+    try {
+      return str ? JSON.parse(str) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function escapeHtml(s) {
+    if (s == null || s === '') return '';
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  }
+
   function createFocusTrap(container) {
     const focusableSelectors = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
     function getFocusables() {
@@ -73,19 +88,102 @@
     unregister(fn) { this._cbs = this._cbs.filter(cb => cb !== fn); }
   };
 
-  function getAmazonLink(product) {
-    return product.amazonUrl + '?tag=' + AFFILIATE_TAG;
+  function getAmazonLink(product, placement = 'unknown') {
+    if (!product || !product.amazonUrl) return '#';
+    try {
+      const baseUrl = product.amazonUrl.startsWith('http') 
+        ? product.amazonUrl 
+        : 'https://www.amazon.in' + (product.amazonUrl.startsWith('/') ? '' : '/') + product.amazonUrl;
+      const url = new URL(baseUrl);
+      url.searchParams.set('tag', AFFILIATE_TAG);
+      if (placement !== 'unknown') {
+        url.searchParams.set('camp', placement);
+      }
+      return url.toString();
+    } catch (e) {
+      return product.amazonUrl + (product.amazonUrl.includes('?') ? '&' : '?') + 'tag=' + AFFILIATE_TAG;
+    }
+  }
+
+  function trackAffiliateClick(product, placement) {
+    const trackingData = {
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+      price: product.price,
+      placement: placement,
+      timestamp: Date.now(),
+      page: window.location.pathname,
+      referrer: document.referrer || 'direct'
+    };
+
+    if (typeof gtag === 'function') {
+      gtag('event', 'affiliate_click', {
+        event_category: 'affiliate',
+        event_label: product.name,
+        value: product.price || 0,
+        custom_placement: placement
+      });
+    }
+
+    const clicks = safeJsonParse(localStorage.getItem('dd_affiliate_clicks') || '[]', []);
+    clicks.push(trackingData);
+    if (clicks.length > 100) clicks.shift();
+    localStorage.setItem('dd_affiliate_clicks', JSON.stringify(clicks));
+
+    const stats = safeJsonParse(localStorage.getItem('dd_affiliate_stats') || '{}', {});
+    stats.totalClicks = (stats.totalClicks || 0) + 1;
+    stats.byPlacement = stats.byPlacement || {};
+    stats.byPlacement[placement] = (stats.byPlacement[placement] || 0) + 1;
+    stats.byCategory = stats.byCategory || {};
+    stats.byCategory[product.category] = (stats.byCategory[product.category] || 0) + 1;
+    localStorage.setItem('dd_affiliate_stats', JSON.stringify(stats));
+
+    return trackingData;
+  }
+
+  function initAffiliateTracking() {
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('[data-affiliate-link], .product-card-amazon-btn, .btn-amazon, .quickview-buy, #buyOnAmazon');
+      if (!link) return;
+      
+      const productId = link.dataset.productId || link.closest('[data-product-id]')?.dataset.productId;
+      const placement = link.dataset.placement || detectPlacement(link);
+      
+      let product = products.find(p => p.id == productId);
+      if (!product && link.textContent.includes('Amazon')) {
+        const card = link.closest('.product-card');
+        const name = card?.querySelector('.product-card-name')?.textContent || 'Unknown';
+        product = { id: productId, name, category: 'Unknown', price: 0 };
+      }
+      
+      if (product) {
+        trackAffiliateClick(product, placement);
+      }
+    });
+  }
+
+  function detectPlacement(element) {
+    if (element.closest('.quickview-overlay')) return 'quickview';
+    if (element.closest('.product-detail')) return 'product-page';
+    if (element.closest('.deals-grid')) return 'deals';
+    if (element.closest('.carousel-track')) return 'carousel';
+    if (element.closest('.products-grid')) return 'shop-grid';
+    if (element.closest('.recently-viewed-grid')) return 'recently-viewed';
+    if (element.closest('.comparison-table')) return 'comparison';
+    return 'unknown';
   }
 
   function renderStars(rating) {
-    const full = Math.floor(rating);
-    const half = rating % 1 >= 0.3;
+    const r = parseFloat(rating) || 0;
+    const full = Math.floor(r);
+    const half = r % 1 >= 0.3;
     const empty = 5 - full - (half ? 1 : 0);
     let html = '';
     for (let i = 0; i < full; i++) html += '<span class="star star-full">★</span>';
     if (half) html += '<span class="star star-half">★</span>';
     for (let i = 0; i < empty; i++) html += '<span class="star star-empty">★</span>';
-    return `<div class="star-rating" title="${rating} out of 5"><span class="stars-wrap">${html}</span><span class="star-count">${rating}</span></div>`;
+    return `<div class="star-rating" title="${r.toFixed(1)} out of 5"><span class="stars-wrap">${html}</span><span class="star-count">${r.toFixed(1)}</span></div>`;
   }
 
   window.DevaDecor = {
@@ -93,6 +191,7 @@
     get favoriteProducts() { return favoriteProducts; },
     dataReady,
     renderProductCard, attachCardEvents, showToast, getAmazonLink, renderStars,
+    trackAffiliateClick, getAffiliateStats: () => safeJsonParse(localStorage.getItem('dd_affiliate_stats') || '{}', {}),
     $, $$, scrollBus
   };
 
@@ -234,7 +333,7 @@
         const totalMatches = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).length;
         let html = '';
         if (matches.length) {
-          html = matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${p.name}" width="50" height="50"><div><strong>${p.name}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('');
+          html = matches.map(p => `<a href="${p.link}" class="search-suggestion"><img src="${p.image}" alt="${escapeHtml(p.name)}" width="50" height="50"><div><strong>${escapeHtml(p.name)}</strong><span>${p.currency || '₹'}${p.price}</span></div></a>`).join('');
           html += `<a href="/shop?q=${encodeURIComponent(input.value.trim())}" class="search-view-all">View all ${totalMatches} result${totalMatches !== 1 ? 's' : ''} →</a>`;
         } else {
           html = '<div class="search-no-results">No products found</div>';
@@ -257,18 +356,21 @@
     if (existing) existing.remove();
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
-    toast.innerHTML = `<strong>${title}</strong><span>${message}</span>`;
+    toast.innerHTML = `<strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span>`;
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('visible'));
     setTimeout(() => { toast.classList.remove('visible'); setTimeout(() => toast.remove(), 300); }, 3000);
   }
 
   // ─── Product Card Renderer ───
-  function renderProductCard(product) {
-    const amazonLink = getAmazonLink(product);
-    return `<div class="product-card" data-id="${product.id}">
+  function renderProductCard(product, placement = 'card') {
+    const amazonLink = getAmazonLink(product, placement);
+    const safeName = escapeHtml(product.name || '');
+    const safeCat = escapeHtml(product.category || '');
+    const safeBadge = product.badge ? escapeHtml(product.badge) : '';
+    return `<div class="product-card" data-id="${product.id}" data-product-id="${product.id}">
       <div class="product-card-img">
-        ${product.badge ? `<span class="product-card-badge">${product.badge}</span>` : ''}
+        ${product.badge ? `<span class="product-card-badge">${safeBadge}</span>` : ''}
         <div class="product-card-actions">
           <button class="product-card-action" data-wishlist-id="${product.id}" aria-label="Add to wishlist">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -278,14 +380,14 @@
           </button>
         </div>
         <a href="${product.link}">
-          <img src="${product.image}" alt="${product.name}" loading="lazy" width="600" height="800" class="${product.image.startsWith('images/') ? 'local-img' : ''}">
+          <img src="${product.image || ''}" alt="${safeName}" loading="lazy" width="600" height="800" class="${(product.image || '').startsWith('images/') ? 'local-img' : ''}">
         </a>
-        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn">Buy on Amazon</a>
+        <a href="${amazonLink}" target="_blank" rel="nofollow" class="product-card-amazon-btn" data-product-id="${product.id}" data-affiliate-link>Buy on Amazon</a>
       </div>
       <div class="product-card-info">
-        <div class="product-card-category">${product.category}</div>
-        ${renderStars(product.rating)}
-        <h3 class="product-card-name"><a href="${product.link}">${product.name}</a></h3>
+        <div class="product-card-category">${safeCat}</div>
+        ${renderStars(product.rating || 0)}
+        <h3 class="product-card-name"><a href="${product.link}">${safeName}</a></h3>
         <div class="product-card-price">
           ${product.price ? `<span class="current">${product.currency || '₹'}${product.price}</span>` : ''}
           ${product.comparePrice ? `<span class="compare">${product.currency || '₹'}${product.comparePrice}</span>` : ''}
@@ -301,7 +403,7 @@
         if (document.startViewTransition) {
           e.preventDefault();
           const card = link.closest('.product-card');
-          const img = card?.querySelector('.product-card-image img');
+          const img = card?.querySelector('.product-card-img img');
           if (img) img.style.viewTransitionName = 'product-hero';
           document.startViewTransition(() => { window.location.href = link.href; });
         }
@@ -942,7 +1044,8 @@
     function open(product) {
       if (overlay) overlay.remove();
       previousFocus = document.activeElement;
-      const desc = product.description || 'Beautifully crafted piece to elevate your living space.';
+      const descRaw = product.description || 'Beautifully crafted piece to elevate your living space.';
+      const desc = escapeHtml(descRaw);
       const amazonLink = getAmazonLink(product);
       const savePct = product.comparePrice ? Math.round((1 - product.price / product.comparePrice) * 100) : 0;
       const priceDisplay = `${product.currency || '₹'}${product.price}`;
@@ -951,23 +1054,23 @@
       overlay.className = 'quickview-overlay';
       overlay.setAttribute('role', 'dialog');
       overlay.setAttribute('aria-modal', 'true');
-      overlay.setAttribute('aria-label', 'Quick view: ' + product.name);
+      overlay.setAttribute('aria-label', 'Quick view: ' + (product.name || ''));
       overlay.innerHTML = `
         <div class="quickview-modal">
           <button class="quickview-close" aria-label="Close quick view">&times;</button>
           <div class="quickview-grid">
             <div class="quickview-img-col">
               <div class="quickview-img-main">
-                <img src="${images[0]}" alt="${product.name}" width="600" height="800" class="qv-main-img">
-                ${product.badge ? `<span class="product-card-badge">${product.badge}</span>` : ''}
+                <img src="${images[0]}" alt="${escapeHtml(product.name)}" width="600" height="800" class="qv-main-img">
+                ${product.badge ? `<span class="product-card-badge">${escapeHtml(product.badge)}</span>` : ''}
               </div>
               <div class="quickview-thumbs" role="group" aria-label="Product images">
                 ${images.map((img, i) => `<button class="qv-thumb${i === 0 ? ' active' : ''}" data-idx="${i}" aria-label="View image ${i + 1} of ${images.length}"><img src="${img}" alt="" width="80" height="80"></button>`).join('')}
               </div>
             </div>
             <div class="quickview-details">
-              <span class="quickview-category">${product.category}</span>
-              <h2 class="quickview-title" id="qv-title">${product.name}</h2>
+              <span class="quickview-category">${escapeHtml(product.category)}</span>
+              <h2 class="quickview-title" id="qv-title">${escapeHtml(product.name)}</h2>
               ${renderStars(product.rating)}
               <div class="quickview-price">
                 <span class="current">${priceDisplay}</span>
@@ -1084,7 +1187,7 @@
     const params = new URLSearchParams(window.location.search);
     const pid = parseInt(params.get('id'), 10);
     if (pid && window.location.pathname.includes('products')) {
-      let viewed = JSON.parse(localStorage.getItem(KEY) || '[]');
+      let viewed = safeJsonParse(localStorage.getItem(KEY) || '[]', []);
       viewed = viewed.filter(id => id !== pid);
       viewed.unshift(pid);
       if (viewed.length > 12) viewed = viewed.slice(0, 12);
@@ -1092,7 +1195,7 @@
     }
     const container = document.getElementById('recentlyViewedGrid');
     if (!container) return;
-    const viewed = JSON.parse(localStorage.getItem(KEY) || '[]').filter(id => id !== pid);
+    const viewed = safeJsonParse(localStorage.getItem(KEY) || '[]', []).filter(id => id !== pid);
     if (!viewed.length) { const sec = container.closest('.recently-viewed-section'); if (sec) sec.style.display = 'none'; return; }
     const items = viewed.slice(0, 6).map(id => products.find(p => p.id === id)).filter(Boolean);
     if (!items.length) { const sec = container.closest('.recently-viewed-section'); if (sec) sec.style.display = 'none'; return; }
@@ -1102,7 +1205,7 @@
   // ─── Wishlist (unified handler with animation feedback + undo) ───
   function initWishlist() {
     const KEY = 'dd_wishlist';
-    function getWishlist() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+    function getWishlist() { return safeJsonParse(localStorage.getItem(KEY) || '[]', []); }
     function saveWishlist(list) { localStorage.setItem(KEY, JSON.stringify(list)); }
     function updateMobileNavBadge() {
       const list = getWishlist();
@@ -1227,7 +1330,7 @@
     if (window.innerWidth > 768) return;
     const nav = document.createElement('nav');
     nav.className = 'mobile-bottom-nav';
-    const wishlistCount = JSON.parse(localStorage.getItem('dd_wishlist') || '[]').length;
+    const wishlistCount = safeJsonParse(localStorage.getItem('dd_wishlist') || '[]', []).length;
     nav.innerHTML = `
       <a href="/" class="mobile-nav-item${window.location.pathname === '/' || window.location.pathname === '/index.html' ? ' active' : ''}">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -1360,7 +1463,7 @@
               noResults.innerHTML = `
                 <div class="empty-state">
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" opacity="0.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M8 11h6"/></svg>
-                  <p>No products match "<strong>${input.value}</strong>"</p>
+                  <p>No products match "<strong>${escapeHtml(input.value)}</strong>"</p>
                   <small>Try a different search term</small>
                 </div>`;
             }
@@ -1376,7 +1479,7 @@
     if (existing) existing.remove();
     const toast = document.createElement('div');
     toast.className = 'toast-notification toast-with-undo';
-    toast.innerHTML = `<div class="toast-content"><strong>${title}</strong><span>${message}</span></div><button class="toast-undo-btn">Undo</button>`;
+    toast.innerHTML = `<div class="toast-content"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span></div><button class="toast-undo-btn">Undo</button>`;
     document.body.appendChild(toast);
     requestAnimationFrame(() => toast.classList.add('visible'));
     let undone = false;
@@ -1471,7 +1574,7 @@
   // ─── Service Worker ───
   function registerSW() {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
     }
   }
 
@@ -1583,6 +1686,239 @@
     initQuickView();
     initRecentlyViewed();
     initWishlist();
+    initSocialProof();
+    initAffiliateTracking();
+    initLeadMagnet();
+  }
+
+  // ─── Social Proof Ticker ───
+  function initSocialProof() {
+    const ticker = $('#socialProofTicker');
+    const textEl = $('#socialProofText');
+    if (!ticker || !textEl) return;
+
+    const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Pune', 'Kolkata', 'Jaipur', 'Ahmedabad', 'Lucknow'];
+    const timeAgo = ['just now', '2 min ago', '5 min ago', '8 min ago', '12 min ago'];
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function getRandomCity() {
+      return cities[Math.floor(Math.random() * cities.length)];
+    }
+    
+    function getRandomTime() {
+      return timeAgo[Math.floor(Math.random() * timeAgo.length)];
+    }
+    
+    function getRandomProduct() {
+      if (!products || products.length === 0) return { name: 'Home Decor Item' };
+      return products[Math.floor(Math.random() * products.length)];
+    }
+    
+    function getRandomViews() {
+      return Math.floor(Math.random() * 30) + 15;
+    }
+
+    const messageGenerators = [
+      () => {
+        const product = getRandomProduct();
+        const name = escapeHtml(product.name || 'Home Decor Item');
+        return { icon: '👁', text: `Someone in <strong>${getRandomCity()}</strong> viewed ${name}` };
+      },
+      () => {
+        const product = getRandomProduct();
+        const name = escapeHtml(product.name || 'Home Decor Item');
+        return { icon: '🛒', text: `<strong>${getRandomCity()}</strong> - Someone clicked "Buy on Amazon" for ${name} <em>${getRandomTime()}</em>` };
+      },
+      () => {
+        const views = getRandomViews();
+        return { icon: '🔥', text: `<strong>${views} people</strong> are browsing right now` };
+      },
+      () => {
+        const product = getRandomProduct();
+        const name = escapeHtml(product.name || 'Home Decor Item');
+        return { icon: '⭐', text: `${name} is <strong>trending</strong> in ${getRandomCity()}` };
+      },
+      () => {
+        const product = getRandomProduct();
+        const name = escapeHtml(product.name || 'Home Decor Item');
+        return { icon: '💬', text: `New inquiry for <strong>bulk order</strong> - ${name}` };
+      }
+    ];
+
+    let currentIndex = 0;
+    let isVisible = false;
+    let hideTimeout = null;
+    let showTimeout = null;
+
+    function showMessage() {
+      const generator = messageGenerators[currentIndex % messageGenerators.length];
+      const { icon, text } = generator();
+      
+      ticker.querySelector('.social-proof-icon').textContent = icon;
+      textEl.innerHTML = text;
+      
+      ticker.classList.remove('fade-out');
+      ticker.classList.add('visible');
+      isVisible = true;
+      
+      hideTimeout = setTimeout(() => {
+        ticker.classList.add('fade-out');
+        setTimeout(() => {
+          ticker.classList.remove('visible');
+          isVisible = false;
+          currentIndex++;
+          scheduleNext();
+        }, 400);
+      }, 4000);
+    }
+
+    function scheduleNext() {
+      const delay = Math.random() * 8000 + 6000;
+      showTimeout = setTimeout(showMessage, delay);
+    }
+
+    setTimeout(showMessage, 3000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearTimeout(hideTimeout);
+        clearTimeout(showTimeout);
+        ticker.classList.remove('visible');
+      } else {
+        scheduleNext();
+      }
+    });
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      ticker.style.display = 'none';
+    }
+  }
+
+  // ─── Lead Magnet Popup ───
+  function initLeadMagnet() {
+    const overlay = $('#leadmagnetOverlay');
+    const closeBtn = $('#leadmagnetClose');
+    const form = $('#leadmagnetForm');
+    
+    if (!overlay) return;
+
+    const STORAGE_KEY = 'dd_leadmagnet_shown';
+    const DISMISS_KEY = 'dd_leadmagnet_dismissed';
+    const SUBSCRIBED_KEY = 'dd_email_subscribed';
+
+    if (localStorage.getItem(SUBSCRIBED_KEY) || localStorage.getItem(DISMISS_KEY)) {
+      return;
+    }
+
+    function showPopup() {
+      const lastShown = localStorage.getItem(STORAGE_KEY);
+      const dayAgo = Date.now() - (24 * 60 * 60 * 1000);
+      
+      if (lastShown && parseInt(lastShown) > dayAgo) {
+        return;
+      }
+
+      overlay.hidden = false;
+      requestAnimationFrame(() => {
+        overlay.classList.add('visible');
+      });
+      localStorage.setItem(STORAGE_KEY, Date.now().toString());
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hidePopup(dismissed = false) {
+      overlay.classList.remove('visible');
+      setTimeout(() => {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }, 300);
+      
+      if (dismissed) {
+        localStorage.setItem(DISMISS_KEY, 'true');
+      }
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => hidePopup(true));
+    }
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        hidePopup(true);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.classList.contains('visible')) {
+        hidePopup(true);
+      }
+    });
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailInput = form.querySelector('input[type="email"]');
+        const email = emailInput ? emailInput.value : '';
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (!submitBtn) return;
+        const originalText = submitBtn.textContent;
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { 'Accept': 'application/json' }
+          });
+
+          if (response.ok) {
+            localStorage.setItem(SUBSCRIBED_KEY, email);
+            showToast('Success!', 'Check your email for the styling guide.');
+            hidePopup(false);
+            
+            if (typeof gtag === 'function') {
+              gtag('event', 'lead_capture', {
+                event_category: 'engagement',
+                event_label: 'styling-guide-2026'
+              });
+            }
+          } else {
+            throw new Error('Failed to submit');
+          }
+        } catch (err) {
+          showToast('Oops!', 'Something went wrong. Please try again.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      });
+    }
+
+    let hasScrolledEnough = false;
+    const scrollThreshold = 0.4;
+
+    function checkScroll() {
+      const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+      if (scrollPercent > scrollThreshold && !hasScrolledEnough) {
+        hasScrolledEnough = true;
+        setTimeout(showPopup, 1000);
+        window.removeEventListener('scroll', checkScroll);
+      }
+    }
+
+    setTimeout(() => {
+      if (!hasScrolledEnough) {
+        showPopup();
+      }
+    }, 30000);
+
+    window.addEventListener('scroll', checkScroll, { passive: true });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
